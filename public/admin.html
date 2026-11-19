@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Beacon Global | Panel Administrativo</title>
+  <style>
+    :root { --bg: #0f172a; --card: #1e293b; --accent: #0ea5e9; --success: #10b981; --text: #f8fafc; --muted: #94a3b8; }
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--text); }
+    header { background: #020617; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+    header h1 { margin: 0; font-size: 1.3rem; color: var(--accent); }
+    .container { max-width: 1200px; margin: 28px auto; padding: 0 20px; }
+    .card { background: var(--card); border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #334155; }
+    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tab-btn { background: #1e293b; color: var(--text); border: 1px solid #475569; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .tab-btn.active { background: var(--accent); color: #020617; border-color: var(--accent); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 5px; }
+    input, select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: var(--text); }
+    .btn { background: var(--accent); color: #020617; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 12px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.88rem; }
+    th, td { padding: 10px; border-bottom: 1px solid #334155; text-align: left; vertical-align: top; }
+    th { color: var(--accent); background: #0f172a; }
+    .doc-link { display: inline-block; background: #0284c7; color: #fff; padding: 4px 8px; border-radius: 5px; text-decoration: none; font-size: 0.78rem; margin: 2px 0; }
+    .hidden { display: none; }
+    .nota-input { width: 65px; padding: 5px; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>BEACON GLOBAL | Administración de Talento Humano</h1>
+    <a href="/" style="color: #94a3b8; text-decoration: none;">← Volver al Portal Público</a>
+  </header>
+
+  <div class="container">
+    <!-- LOGIN -->
+    <div class="card" id="loginBox" style="max-width: 420px; margin: 60px auto;">
+      <h2 style="margin-top:0;">Acceso Restringido</h2>
+      <p style="color: var(--muted); font-size: 0.9rem;">Ingrese la clave maestra de consultor para gestionar procesos de selección y evaluaciones.</p>
+      <input type="password" id="adminPass" placeholder="Contraseña maestra" />
+      <button class="btn" style="width:100%;" onclick="iniciarSesion()">Ingresar al Sistema</button>
+      <p id="loginError" style="color: #fca5a5; font-size: 0.85rem;"></p>
+    </div>
+
+    <!-- PANEL PRINCIPAL -->
+    <div id="adminPanel" class="hidden">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="mostrarTab('tabPostulantes', this)">1. Postulantes y Hojas de Vida</button>
+        <button class="tab-btn" onclick="mostrarTab('tabVacantes', this)">2. Gestión de Vacantes</button>
+        <button class="tab-btn" onclick="mostrarTab('tabEvaluacion', this)">3. Evaluación de Desempeño</button>
+      </div>
+
+      <!-- TAB 1: POSTULANTES -->
+      <div id="tabPostulantes" class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <h2 style="margin:0;">Candidatos Postulados</h2>
+          <button class="btn" style="margin:0;" onclick="cargarPostulantes()">Actualizar Lista</button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Cargo</th>
+                <th>Postulante / Cédula</th>
+                <th>Contacto / Profesión</th>
+                <th>Documentos PDF</th>
+                <th>Calificación (M / T / E)</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tablaPostulantes"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: VACANTES -->
+      <div id="tabVacantes" class="card hidden">
+        <h2>Publicar Nueva Convocatoria / Vacante</h2>
+        <form id="formVacante">
+          <div class="grid">
+            <div><label>Código *</label><input type="text" id="v_codigo" placeholder="Ej. BG-2026-002" required /></div>
+            <div><label>Título del Puesto *</label><input type="text" id="v_titulo" placeholder="Ej. Guardalmacén" required /></div>
+            <div><label>Unidad / Área</label><input type="text" id="v_unidad" placeholder="Ej. Dirección Financiera" /></div>
+            <div><label>Ciudad</label><input type="text" id="v_ciudad" value="Quito" /></div>
+          </div>
+          <div style="margin-top:12px;">
+            <label>Descripción y Requisitos del Cargo</label>
+            <textarea id="v_desc" rows="3" placeholder="Detalle perfil requerido, instrucción formal y experiencia..."></textarea>
+          </div>
+          <button type="submit" class="btn">Publicar Vacante</button>
+        </form>
+        <h3 style="margin-top:28px;">Convocatorias Registradas</h3>
+        <table>
+          <thead><tr><th>Código</th><th>Puesto</th><th>Área</th><th>Ciudad</th><th>Estado</th></tr></thead>
+          <tbody id="tablaVacantes"></tbody>
+        </table>
+      </div>
+
+      <!-- TAB 3: EVALUACIÓN DE DESEMPEÑO -->
+      <div id="tabEvaluacion" class="card hidden">
+        <h2>Registro de Evaluación de Desempeño</h2>
+        <form id="formEvaluacion">
+          <div class="grid">
+            <div><label>Período *</label><input type="text" id="e_periodo" placeholder="Ej. 2026-S2" required /></div>
+            <div><label>Cédula Servidor *</label><input type="text" id="e_cedula" maxlength="10" required /></div>
+            <div><label>Nombre Completo *</label><input type="text" id="e_nombre" required /></div>
+            <div><label>Cargo *</label><input type="text" id="e_cargo" required /></div>
+            <div><label>Unidad / Dirección</label><input type="text" id="e_unidad" /></div>
+            <div><label>Evaluador *</label><input type="text" id="e_evaluador" required /></div>
+            <div><label>Metas / KPIs (50%) [0-100]</label><input type="number" id="e_metas" min="0" max="100" step="0.01" required /></div>
+            <div><label>Competencias (30%) [0-100]</label><input type="number" id="e_comp" min="0" max="100" step="0.01" required /></div>
+            <div><label>Conductual (20%) [0-100]</label><input type="number" id="e_cond" min="0" max="100" step="0.01" required /></div>
+          </div>
+          <div style="margin-top:12px;"><label>Observaciones / Plan de Mejora</label><input type="text" id="e_obs" /></div>
+          <button type="submit" class="btn">Guardar Evaluación</button>
+        </form>
+
+        <h3 style="margin-top:28px;">Historial de Evaluaciones</h3>
+        <table>
+          <thead><tr><th>Período</th><th>Servidor</th><th>Cargo</th><th>Metas</th><th>Comp.</th><th>Cond.</th><th>Nota Final</th></tr></thead>
+          <tbody id="tablaEvaluaciones"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let claveAdmin = '';
+
+    async function iniciarSesion() {
+      const pass = document.getElementById('adminPass').value;
+      const res = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pass })
+      });
+      const data = await res.json();
+      if (data.exito) {
+        claveAdmin = pass;
+        document.getElementById('loginBox').classList.add('hidden');
+        document.getElementById('adminPanel').classList.remove('hidden');
+        cargarPostulantes();
+        cargarVacantesAdmin();
+        cargarEvaluaciones();
+      } else {
+        document.getElementById('loginError').textContent = data.error;
+      }
+    }
+
+    function mostrarTab(id, btn) {
+      ['tabPostulantes', 'tabVacantes', 'tabEvaluacion'].forEach(t => document.getElementById(t).classList.add('hidden'));
+      document.getElementById(id).classList.remove('hidden');
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    async function cargarPostulantes() {
+      const res = await fetch('/api/admin/postulantes', { headers: { 'x-admin-pass': claveAdmin } });
+      const data = await res.json();
+      const tbody = document.getElementById('tablaPostulantes');
+      tbody.innerHTML = (data.postulantes || []).map(p => {
+        const docsHtml = p.documentos.length
+          ? p.documentos.map(d => `<a href="${d.url}" target="_blank" class="doc-link">📄 ${d.nombre}</a>`).join('<br/>')
+          : '<span style="color:#f87171;">Sin PDF adjunto</span>';
+        return `
+          <tr>
+            <td><strong>${p.codigo_vacante}</strong><br/>${p.titulo_puesto}</td>
+            <td><strong>${p.nombre_completo}</strong><br/>C.I.: ${p.cedula}<br/>Ciudad: ${p.ciudad}</td>
+            <td>${p.profesion}<br/>📧 ${p.correo}<br/>📱 ${p.celular}</td>
+            <td>${docsHtml}</td>
+            <td>
+              M: <input type="number" class="nota-input" id="m_${p.id}" value="${p.nota_meritos}" /><br/>
+              T: <input type="number" class="nota-input" id="t_${p.id}" value="${p.nota_tecnica}" /><br/>
+              E: <input type="number" class="nota-input" id="e_${p.id}" value="${p.nota_entrevista}" />
+            </td>
+            <td>
+              <select id="est_${p.id}">
+                <option ${p.estado_proceso==='POSTULADO'?'selected':''}>POSTULADO</option>
+                <option ${p.estado_proceso==='PRESELECCIONADO'?'selected':''}>PRESELECCIONADO</option>
+                <option ${p.estado_proceso==='ENTREVISTA'?'selected':''}>ENTREVISTA</option>
+                <option ${p.estado_proceso==='SELECCIONADO'?'selected':''}>SELECCIONADO</option>
+                <option ${p.estado_proceso==='NO CALIFICA'?'selected':''}>NO CALIFICA</option>
+              </select>
+            </td>
+            <td><button class="btn" style="margin:0; padding:6px 12px;" onclick="guardarNota(${p.id})">Guardar</button></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function guardarNota(id) {
+      await fetch(`/api/admin/postulantes/${id}/calificar`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
+        body: JSON.stringify({
+          nota_meritos: document.getElementById(`m_${id}`).value,
+          nota_tecnica: document.getElementById(`t_${id}`).value,
+          nota_entrevista: document.getElementById(`e_${id}`).value,
+          estado_proceso: document.getElementById(`est_${id}`).value
+        })
+      });
+      alert('Calificación y estado actualizados.');
+    }
+
+    async function cargarVacantesAdmin() {
+      const res = await fetch('/api/admin/vacantes', { headers: { 'x-admin-pass': claveAdmin } });
+      const data = await res.json();
+      document.getElementById('tablaVacantes').innerHTML = (data.vacantes || []).map(v => `
+        <tr><td>${v.codigo}</td><td>${v.titulo_puesto}</td><td>${v.unidad_area || ''}</td><td>${v.ciudad}</td><td>${v.estado}</td></tr>
+      `).join('');
+    }
+
+    document.getElementById('formVacante').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await fetch('/api/admin/vacantes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
+        body: JSON.stringify({
+          codigo: document.getElementById('v_codigo').value,
+          titulo_puesto: document.getElementById('v_titulo').value,
+          unidad_area: document.getElementById('v_unidad').value,
+          ciudad: document.getElementById('v_ciudad').value,
+          descripcion: document.getElementById('v_desc').value
+        })
+      });
+      e.target.reset();
+      cargarVacantesAdmin();
+      alert('Vacante publicada con éxito.');
+    });
+
+    async function cargarEvaluaciones() {
+      const res = await fetch('/api/admin/evaluaciones', { headers: { 'x-admin-pass': claveAdmin } });
+      const data = await res.json();
+      document.getElementById('tablaEvaluaciones').innerHTML = (data.evaluaciones || []).map(ev => `
+        <tr>
+          <td>${ev.periodo}</td><td>${ev.nombre_evaluado} (${ev.cedula_evaluado})</td><td>${ev.cargo}</td>
+          <td>${ev.puntaje_metas}</td><td>${ev.puntaje_competencias}</td><td>${ev.puntaje_conductual}</td>
+          <td><strong>${ev.nota_final}</strong></td>
+        </tr>
+      `).join('');
+    }
+
+    document.getElementById('formEvaluacion').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await fetch('/api/admin/evaluaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
+        body: JSON.stringify({
+          periodo: document.getElementById('e_periodo').value,
+          cedula_evaluado: document.getElementById('e_cedula').value,
+          nombre_evaluado: document.getElementById('e_nombre').value,
+          cargo: document.getElementById('e_cargo').value,
+          unidad: document.getElementById('e_unidad').value,
+          evaluador: document.getElementById('e_evaluador').value,
+          puntaje_metas: document.getElementById('e_metas').value,
+          puntaje_competencias: document.getElementById('e_comp').value,
+          puntaje_conductual: document.getElementById('e_cond').value,
+          observaciones: document.getElementById('e_obs').value
+        })
+      });
+      e.target.reset();
+      cargarEvaluaciones();
+      alert('Evaluación de desempeño registrada.');
+    });
+  </script>
+</body>
+</html>
