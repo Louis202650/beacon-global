@@ -1,352 +1,439 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Beacon Global | Panel Administrativo</title>
-  <style>
-    :root { --bg: #0f172a; --card: #1e293b; --accent: #0ea5e9; --success: #10b981; --text: #f8fafc; --muted: #94a3b8; }
-    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); }
-    header { background: #020617; padding: 16px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-    header h1 { margin: 0; font-size: 1.3rem; color: var(--accent); }
-    .container { max-width: 1200px; margin: 28px auto; padding: 0 20px; }
-    .card { background: var(--card); border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #334155; }
-    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .tab-btn { background: #1e293b; color: var(--text); border: 1px solid #475569; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-    .tab-btn.active { background: var(--accent); color: #020617; border-color: var(--accent); }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
-    label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 5px; }
-    input, select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: var(--text); }
-    .btn { background: var(--accent); color: #020617; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 12px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 0.88rem; }
-    th, td { padding: 10px; border-bottom: 1px solid #334155; text-align: left; vertical-align: top; }
-    th { color: var(--accent); background: #0f172a; }
-    .doc-link { display: inline-block; background: #0284c7; color: #fff; padding: 4px 8px; border-radius: 5px; text-decoration: none; font-size: 0.78rem; margin: 2px 0; }
-    .hidden { display: none; }
-    .nota-input { width: 65px; padding: 5px; font-size: 0.85rem; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEACON GLOBAL | Administración de Talento Humano</title>
+    <style>
+        :root {
+            --bg: #0b132b;
+            --card: #131c31;
+            --border: #24324d;
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --text: #f8fafc;
+            --muted: #94a3b8;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { margin: 0; background: var(--bg); color: var(--text); }
+        header {
+            background: #070d1f;
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        header h1 { margin: 0; font-size: 1.25rem; color: var(--primary); letter-spacing: 0.5px; }
+        header a { color: var(--muted); text-decoration: none; font-size: 0.9rem; }
+        header a:hover { color: var(--text); }
+        .container { max-width: 1280px; margin: 25px auto; padding: 0 20px; }
+        .hidden { display: none !important; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            background: #17223b;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            padding: 11px 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .tab-btn:hover { border-color: var(--primary); color: var(--text); }
+        .tab-btn.active {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.88rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover { background: var(--primary-hover); }
+        .btn-green { background: #10b981; }
+        .btn-green:hover { background: #059669; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
+        th {
+            background: #0b132b;
+            color: var(--primary);
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+        input[type="text"], input[type="password"], input[type="number"], select, textarea {
+            background: #0b132b;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-size: 0.88rem;
+        }
+        input[type="number"] { width: 65px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+        .grid label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+        .grid input, .grid select { width: 100%; }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>BEACON GLOBAL | Administración de Talento Humano</h1>
-    <a href="/" style="color: #94a3b8; text-decoration: none;">← Volver al Portal Público</a>
-  </header>
 
-  <div class="container">
+<header>
+    <h1>BEACON GLOBAL | Administración de Talento Humano</h1>
+    <a href="/">← Volver al Portal Público</a>
+</header>
+
+<div class="container">
     <!-- LOGIN -->
     <div class="card" id="loginBox" style="max-width: 420px; margin: 60px auto;">
-      <h2 style="margin-top:0;">Acceso Restringido</h2>
-      <p style="color: var(--muted); font-size: 0.9rem;">Ingrese la clave maestra de consultor para gestionar procesos de selección y evaluaciones.</p>
-      <input type="password" id="adminPass" placeholder="Contraseña maestra" />
-      <button class="btn" style="width:100%;" onclick="iniciarSesion()">Ingresar al Sistema</button>
-      <p id="loginError" style="color: #fca5a5; font-size: 0.85rem;"></p>
+        <h2 style="margin-top:0;">Acceso Restringido</h2>
+        <p style="color: var(--muted); font-size: 0.9rem;">Ingrese la clave maestra de consultor para gestionar procesos de selección.</p>
+        <input type="password" id="adminPass" placeholder="Contraseña maestra" style="width:100%; margin-bottom:14px;" />
+        <button class="btn" style="width:100%;" onclick="iniciarSesion()">Ingresar al Sistema</button>
+        <p id="loginError" style="color: #fca5a5; font-size: 0.85rem; margin-top:10px;"></p>
     </div>
 
     <!-- PANEL PRINCIPAL -->
     <div id="adminPanel" class="hidden">
-      <div class="tabs">
-        <button class="tab-btn active" onclick="mostrarTab('tabPostulantes', this)">1. Postulantes y Hojas de Vida</button>
-        <button class="tab-btn" onclick="mostrarTab('tabVacantes', this)">2. Gestión de Vacantes</button>
-        <button class="tab-btn" onclick="mostrarTab('tabEvaluacion', this)">3. Evaluación de Desempeño</button>
-      </div>
-
-      <!-- TAB 1: POSTULANTES -->
-      <div id="tabPostulantes" class="card">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <h2 style="margin:0;">Candidatos Postulados</h2>
-          <button class="btn" style="margin:0;" onclick="cargarPostulantes()">Actualizar Lista</button>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="mostrarTab('tabPostulantes', this)">1. Postulantes y Hojas de Vida</button>
+            <button class="tab-btn" onclick="mostrarTab('tabVacantes', this)">2. Gestión de Vacantes</button>
+            <button class="tab-btn" onclick="mostrarTab('tabEvaluacion', this)">3. Evaluación de Desempeño</button>
+            <button class="tab-btn" onclick="mostrarTab('tab4', this)">4. Confiabilidad (8F) y 16PF</button>
+            <button class="tab-btn" onclick="mostrarTab('tab5', this)">5. Verificación Antecedentes</button>
         </div>
-        <div style="overflow-x:auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Cargo</th>
-                <th>Postulante / Cédula</th>
-                <th>Contacto / Profesión</th>
-                <th>Documentos PDF</th>
-                <th>Calificación (M / T / E)</th>
-                <th>Estado</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody id="tablaPostulantes"></tbody>
-          </table>
+
+        <!-- TAB 1: POSTULANTES -->
+        <div id="tabPostulantes" class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0;">Candidatos Postulados</h2>
+                <button class="btn" onclick="cargarPostulantes()">Actualizar Lista</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cargo</th>
+                        <th>Postulante / Cédula</th>
+                        <th>Contacto / Profesión</th>
+                        <th>Documentos PDF</th>
+                        <th>Calificación (M / T / E)</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody id="listaPostulantes">
+                    <tr><td colspan="7">Cargando postulantes...</td></tr>
+                </tbody>
+            </table>
         </div>
-      </div>
 
-      <!-- TAB 2: VACANTES -->
-      <div id="tabVacantes" class="card hidden">
-        <h2>Publicar Nueva Convocatoria / Vacante</h2>
-        <form id="formVacante">
-          <div class="grid">
-            <div><label>Código *</label><input type="text" id="v_codigo" placeholder="Ej. BG-2026-002" required /></div>
-            <div><label>Título del Puesto *</label><input type="text" id="v_titulo" placeholder="Ej. Guardalmacén" required /></div>
-            <div><label>Unidad / Área</label><input type="text" id="v_unidad" placeholder="Ej. Dirección Financiera" /></div>
-            <div><label>Ciudad</label><input type="text" id="v_ciudad" value="Quito" /></div>
-          </div>
-          <div style="margin-top:12px;">
-            <label>Descripción y Requisitos del Cargo</label>
-            <textarea id="v_desc" rows="3" placeholder="Detalle perfil requerido, instrucción formal y experiencia..."></textarea>
-          </div>
-          <button type="submit" class="btn">Publicar Vacante</button>
-        </form>
-        <h3 style="margin-top:28px;">Convocatorias Registradas</h3>
-        <table>
-          <thead><tr><th>Código</th><th>Puesto</th><th>Área</th><th>Ciudad</th><th>Estado</th></tr></thead>
-          <tbody id="tablaVacantes"></tbody>
-        </table>
-      </div>
+        <!-- TAB 2: VACANTES -->
+        <div id="tabVacantes" class="card hidden">
+            <h2>Publicar Nueva Convocatoria / Vacante</h2>
+            <form id="formVacante">
+                <div class="grid">
+                    <div><label>Código *</label><input type="text" id="v_codigo" placeholder="Ej. BG-2026-002" required /></div>
+                    <div><label>Título del Puesto *</label><input type="text" id="v_titulo" placeholder="Ej. Coordinador Contable" required /></div>
+                    <div><label>Unidad / Área</label><input type="text" id="v_unidad" placeholder="Ej. Finanzas" /></div>
+                    <div><label>Ciudad</label><input type="text" id="v_ciudad" value="Quito" /></div>
+                </div>
+                <div style="margin-top:12px;">
+                    <label style="display:block; font-size:0.85rem; color:var(--muted); margin-bottom:4px;">Descripción y Requisitos del Cargo</label>
+                    <textarea id="v_desc" rows="3" style="width:100%;"></textarea>
+                </div>
+                <button type="submit" class="btn" style="margin-top:12px;">Publicar Vacante</button>
+            </form>
+            <h3 style="margin-top:25px;">Vacantes Registradas</h3>
+            <table>
+                <thead><tr><th>Código</th><th>Cargo</th><th>Ciudad</th><th>Estado</th><th>Acción</th></tr></thead>
+                <tbody id="listaVacantes"></tbody>
+            </table>
+        </div>
 
-      <!-- TAB 3: EVALUACIÓN DE DESEMPEÑO -->
-      <div id="tabEvaluacion" class="card hidden">
-        <h2>Registro de Evaluación de Desempeño</h2>
-        <form id="formEvaluacion">
-          <div class="grid">
-            <div><label>Período *</label><input type="text" id="e_periodo" placeholder="Ej. 2026-S2" required /></div>
-            <div><label>Cédula Servidor *</label><input type="text" id="e_cedula" maxlength="10" required /></div>
-            <div><label>Nombre Completo *</label><input type="text" id="e_nombre" required /></div>
-            <div><label>Cargo *</label><input type="text" id="e_cargo" required /></div>
-            <div><label>Unidad / Dirección</label><input type="text" id="e_unidad" /></div>
-            <div><label>Evaluador *</label><input type="text" id="e_evaluador" required /></div>
-            <div><label>Metas / KPIs (50%) [0-100]</label><input type="number" id="e_metas" min="0" max="100" step="0.01" required /></div>
-            <div><label>Competencias (30%) [0-100]</label><input type="number" id="e_comp" min="0" max="100" step="0.01" required /></div>
-            <div><label>Conductual (20%) [0-100]</label><input type="number" id="e_cond" min="0" max="100" step="0.01" required /></div>
-          </div>
-          <div style="margin-top:12px;"><label>Observaciones / Plan de Mejora</label><input type="text" id="e_obs" /></div>
-          <button type="submit" class="btn">Guardar Evaluación</button>
-        </form>
+        <!-- TAB 3: EVALUACIÓN DE DESEMPEÑO -->
+        <div id="tabEvaluacion" class="card hidden">
+            <h2>Evaluación de Desempeño por Competencias</h2>
+            <form id="formEvaluacion">
+                <div class="grid">
+                    <div><label>Colaborador / Postulante</label><input type="text" id="ev_nombre" required /></div>
+                    <div><label>Cargo Evaluado</label><input type="text" id="ev_cargo" required /></div>
+                    <div><label>Periodo</label><input type="text" id="ev_periodo" placeholder="Ej. 2026-Q4" required /></div>
+                    <div><label>Puntaje Final (0-100)</label><input type="number" id="ev_puntaje" min="0" max="100" required /></div>
+                </div>
+                <div style="margin-top:12px;">
+                    <label style="display:block; font-size:0.85rem; color:var(--muted); margin-bottom:4px;">Observaciones y Plan de Mejora</label>
+                    <textarea id="ev_obs" rows="2" style="width:100%;"></textarea>
+                </div>
+                <button type="submit" class="btn" style="margin-top:12px;">Registrar Evaluación</button>
+            </form>
+            <table>
+                <thead><tr><th>Colaborador</th><th>Cargo</th><th>Periodo</th><th>Puntaje</th><th>Observaciones</th></tr></thead>
+                <tbody id="listaEvaluaciones"></tbody>
+            </table>
+        </div>
 
-        <h3 style="margin-top:28px;">Historial de Evaluaciones</h3>
-        <table>
-          <thead><tr><th>Período</th><th>Servidor</th><th>Cargo</th><th>Metas</th><th>Comp.</th><th>Cond.</th><th>Nota Final</th></tr></thead>
-          <tbody id="tablaEvaluaciones"></tbody>
-        </table>
-      </div>
+        <!-- TAB 4: CONFIABILIDAD (8F) Y 16PF -->
+        <div id="tab4" class="card hidden">
+            <h2>4. Evaluaciones Opcionales para Terna (Confiabilidad 8 Factores + 16PF)</h2>
+            <p style="color:var(--muted); font-size:0.9rem;">Active las pruebas únicamente para los candidatos opcionados. Al completarse, el puntaje sincroniza automáticamente la casilla <strong>T</strong>.</p>
+            <div id="tablaEvaluaciones">Cargando candidatos...</div>
+        </div>
+
+        <!-- TAB 5: VERIFICACIÓN DE ANTECEDENTES -->
+        <div id="tab5" class="card hidden">
+            <h2>5. Verificación de Antecedentes en Línea y Respaldo PDF</h2>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;">
+                <a href="https://certificados.ministeriodelinterior.gob.ec/gestorcertificados/antecedentes/" target="_blank" class="btn">🔍 Antecedentes Penales (Min. Interior)</a>
+                <a href="https://procesosjudiciales.funcionjudicial.gob.ec/busqueda-filtros" target="_blank" class="btn">⚖️ Procesos Judiciales (SATJE)</a>
+                <a href="https://www.senescyt.gob.ec/consulta-titulos-web/faces/vista/consulta/consulta.xhtml" target="_blank" class="btn">🎓 Títulos Académicos (SENESCYT)</a>
+            </div>
+            <div id="tablaAntecedentes">Cargando registros...</div>
+        </div>
     </div>
-  </div>
+</div>
 
-  <script>
-    let claveAdmin = '';
+<script>
+let claveAdmin = '';
 
-    async function iniciarSesion() {
-      const pass = document.getElementById('adminPass').value;
-      const res = await fetch('/api/admin/login', {
+async function iniciarSesion() {
+    const pass = document.getElementById('adminPass').value;
+    const res = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: pass })
-      });
-      const data = await res.json();
-      if (data.exito) {
+    });
+    if (res.ok) {
         claveAdmin = pass;
         document.getElementById('loginBox').classList.add('hidden');
         document.getElementById('adminPanel').classList.remove('hidden');
         cargarPostulantes();
-        cargarVacantesAdmin();
+        cargarVacantes();
         cargarEvaluaciones();
-      } else {
-        document.getElementById('loginError').textContent = data.error;
-      }
+        cargarModuloV2();
+    } else {
+        document.getElementById('loginError').innerText = 'Contraseña incorrecta.';
     }
+}
 
-    function mostrarTab(id, btn) {
-      ['tabPostulantes', 'tabVacantes', 'tabEvaluacion'].forEach(t => document.getElementById(t).classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+function mostrarTab(tabId, btn) {
+    document.querySelectorAll('#adminPanel > .card').forEach(el => el.classList.add('hidden'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.remove('hidden');
+    btn.classList.add('active');
+}
+
+async function cargarPostulantes() {
+    const res = await fetch('/api/admin/postulantes');
+    const data = await res.json();
+    const tbody = document.getElementById('listaPostulantes');
+    if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="7">No hay postulantes registrados aún.</td></tr>';
+        return;
     }
-
-    async function cargarPostulantes() {
-      const res = await fetch('/api/admin/postulantes', { headers: { 'x-admin-pass': claveAdmin } });
-      const data = await res.json();
-      const tbody = document.getElementById('tablaPostulantes');
-      tbody.innerHTML = (data.postulantes || []).map(p => {
-        const docsHtml = p.documentos.length
-          ? p.documentos.map(d => `<a href="${d.url}" target="_blank" class="doc-link">📄 ${d.nombre}</a>`).join('<br/>')
-          : '<span style="color:#f87171;">Sin PDF adjunto</span>';
-        return `
-          <tr>
-            <td><strong>${p.codigo_vacante}</strong><br/>${p.titulo_puesto}</td>
-            <td><strong>${p.nombre_completo}</strong><br/>C.I.: ${p.cedula}<br/>Ciudad: ${p.ciudad}</td>
-            <td>${p.profesion}<br/>📧 ${p.correo}<br/>📱 ${p.celular}</td>
-            <td>${docsHtml}</td>
-            <td>
-              M: <input type="number" class="nota-input" id="m_${p.id}" value="${p.nota_meritos}" /><br/>
-              T: <input type="number" class="nota-input" id="t_${p.id}" value="${p.nota_tecnica}" /><br/>
-              E: <input type="number" class="nota-input" id="e_${p.id}" value="${p.nota_entrevista}" />
-            </td>
-            <td>
-              <select id="est_${p.id}">
-                <option ${p.estado_proceso==='POSTULADO'?'selected':''}>POSTULADO</option>
-                <option ${p.estado_proceso==='PRESELECCIONADO'?'selected':''}>PRESELECCIONADO</option>
-                <option ${p.estado_proceso==='ENTREVISTA'?'selected':''}>ENTREVISTA</option>
-                <option ${p.estado_proceso==='SELECCIONADO'?'selected':''}>SELECCIONADO</option>
-                <option ${p.estado_proceso==='NO CALIFICA'?'selected':''}>NO CALIFICA</option>
-              </select>
-            </td>
-            <td><button class="btn" style="margin:0; padding:6px 12px;" onclick="guardarNota(${p.id})">Guardar</button></td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    async function guardarNota(id) {
-      await fetch(`/api/admin/postulantes/${id}/calificar`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
-        body: JSON.stringify({
-          nota_meritos: document.getElementById(`m_${id}`).value,
-          nota_tecnica: document.getElementById(`t_${id}`).value,
-          nota_entrevista: document.getElementById(`e_${id}`).value,
-          estado_proceso: document.getElementById(`est_${id}`).value
-        })
-      });
-      alert('Calificación y estado actualizados.');
-    }
-
-    async function cargarVacantesAdmin() {
-      const res = await fetch('/api/admin/vacantes', { headers: { 'x-admin-pass': claveAdmin } });
-      const data = await res.json();
-      document.getElementById('tablaVacantes').innerHTML = (data.vacantes || []).map(v => `
-        <tr><td>${v.codigo}</td><td>${v.titulo_puesto}</td><td>${v.unidad_area || ''}</td><td>${v.ciudad}</td><td>${v.estado}</td></tr>
-      `).join('');
-    }
-
-    document.getElementById('formVacante').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await fetch('/api/admin/vacantes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
-        body: JSON.stringify({
-          codigo: document.getElementById('v_codigo').value,
-          titulo_puesto: document.getElementById('v_titulo').value,
-          unidad_area: document.getElementById('v_unidad').value,
-          ciudad: document.getElementById('v_ciudad').value,
-          descripcion: document.getElementById('v_desc').value
-        })
-      });
-      e.target.reset();
-      cargarVacantesAdmin();
-      alert('Vacante publicada con éxito.');
-    });
-
-    async function cargarEvaluaciones() {
-      const res = await fetch('/api/admin/evaluaciones', { headers: { 'x-admin-pass': claveAdmin } });
-      const data = await res.json();
-      document.getElementById('tablaEvaluaciones').innerHTML = (data.evaluaciones || []).map(ev => `
+    tbody.innerHTML = data.map(p => `
         <tr>
-          <td>${ev.periodo}</td><td>${ev.nombre_evaluado} (${ev.cedula_evaluado})</td><td>${ev.cargo}</td>
-          <td>${ev.puntaje_metas}</td><td>${ev.puntaje_competencias}</td><td>${ev.puntaje_conductual}</td>
-          <td><strong>${ev.nota_final}</strong></td>
+            <td><strong>${p.cargo_postulado || ''}</strong></td>
+            <td><strong>${p.nombres} ${p.apellidos}</strong><br><small>C.I.: ${p.cedula}</small><br><small>Ciudad: ${p.ciudad || ''}</small></td>
+            <td>${p.profesion || ''}<br><small>📧 ${p.email}</small><br><small>📱 ${p.telefono || ''}</small></td>
+            <td>${p.archivo_nombre ? `<a href="/api/admin/postulantes/${p.id}/pdf" target="_blank" class="btn">📄 ${p.archivo_nombre}</a>` : 'Sin archivo'}</td>
+            <td>
+                M: <input type="number" step="0.1" id="m_${p.id}" value="${p.nota_meritos || 0}"><br>
+                T: <input type="number" step="0.1" id="t_${p.id}" value="${p.nota_test || 0}" style="margin-top:4px;"><br>
+                E: <input type="number" step="0.1" id="e_${p.id}" value="${p.nota_entrevista || 0}" style="margin-top:4px;">
+            </td>
+            <td>
+                <select id="est_${p.id}">
+                    <option ${p.estado==='POSTULADO'?'selected':''}>POSTULADO</option>
+                    <option ${p.estado==='PRESELECCIONADO'?'selected':''}>PRESELECCIONADO</option>
+                    <option ${p.estado==='TERNA'?'selected':''}>TERNA</option>
+                    <option ${p.estado==='SELECCIONADO'?'selected':''}>SELECCIONADO</option>
+                    <option ${p.estado==='NO APLICA'?'selected':''}>NO APLICA</option>
+                </select>
+            </td>
+            <td><button class="btn" onclick="guardarPostulante(${p.id})">Guardar</button></td>
         </tr>
-      `).join('');
-    }
+    `).join('');
+}
 
-    document.getElementById('formEvaluacion').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      await fetch('/api/admin/evaluaciones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
-        body: JSON.stringify({
-          periodo: document.getElementById('e_periodo').value,
-          cedula_evaluado: document.getElementById('e_cedula').value,
-          nombre_evaluado: document.getElementById('e_nombre').value,
-          cargo: document.getElementById('e_cargo').value,
-          unidad: document.getElementById('e_unidad').value,
-          evaluador: document.getElementById('e_evaluador').value,
-          puntaje_metas: document.getElementById('e_metas').value,
-          puntaje_competencias: document.getElementById('e_comp').value,
-          puntaje_conductual: document.getElementById('e_cond').value,
-          observaciones: document.getElementById('e_obs').value
-        })
-      });
-      e.target.reset();
-      cargarEvaluaciones();
-      alert('Evaluación de desempeño registrada.');
+async function guardarPostulante(id) {
+    const body = {
+        nota_meritos: document.getElementById(`m_${id}`).value,
+        nota_test: document.getElementById(`t_${id}`).value,
+        nota_entrevista: document.getElementById(`e_${id}`).value,
+        estado: document.getElementById(`est_${id}`).value
+    };
+    const res = await fetch(`/api/admin/postulantes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
     });
-  </script>
-</body>
-</html>
-<button onclick="mostrarTab('tab4')">4. Confiabilidad (8F) y 16PF</button>
-<button onclick="mostrarTab('tab5')">5. Verificación Antecedentes</button>
-<!-- PESTAÑA 4: EVALUACIONES PSICOMÉTRICAS OPCIONALES -->
-<div id="tab4" class="tab-content" style="display:none; background:#1c2541; padding:20px; border-radius:10px; margin-top:20px;">
-    <h2>4. Evaluaciones Opcionales para Terna (Confiabilidad 8 Factores + 16PF)</h2>
-    <p style="color:#94a3b8; font-size:0.9rem;">Active las pruebas únicamente para los candidatos opcionados. Al completarse, el puntaje sincroniza automáticamente la casilla <strong>T</strong>.</p>
-    <div id="tablaEvaluaciones">Cargando candidatos...</div>
-</div>
+    if (res.ok) alert('Calificación y estado actualizados.');
+}
 
-<!-- PESTAÑA 5: DEBIDA DILIGENCIA Y ANTECEDENTES EN LÍNEA (ECUADOR) -->
-<div id="tab5" class="tab-content" style="display:none; background:#1c2541; padding:20px; border-radius:10px; margin-top:20px;">
-    <h2>5. Verificación de Antecedentes en Línea y Respaldo PDF</h2>
-    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
-        <a href="https://certificados.ministeriodelinterior.gob.ec/gestorcertificados/antecedentes/" target="_blank" style="background:#0284c7; color:white; padding:10px 15px; border-radius:6px; text-decoration:none; font-weight:bold;">🔍 Consultar Antecedentes Penales (Min. Interior)</a>
-        <a href="https://procesosjudiciales.funcionjudicial.gob.ec/busqueda-filtros" target="_blank" style="background:#0284c7; color:white; padding:10px 15px; border-radius:6px; text-decoration:none; font-weight:bold;">⚖️ Consultar Procesos Judiciales (SATJE)</a>
-        <a href="https://www.senescyt.gob.ec/consulta-titulos-web/faces/vista/consulta/consulta.xhtml" target="_blank" style="background:#0284c7; color:white; padding:10px 15px; border-radius:6px; text-decoration:none; font-weight:bold;">🎓 Consultar Títulos Académicos (SENESCYT)</a>
-    </div>
-    <div id="tablaAntecedentes">Cargando registros...</div>
-</div>
+async function cargarVacantes() {
+    const res = await fetch('/api/vacantes');
+    const data = await res.json();
+    document.getElementById('listaVacantes').innerHTML = data.map(v => `
+        <tr>
+            <td><strong>${v.codigo}</strong></td>
+            <td>${v.titulo}</td>
+            <td>${v.ciudad || ''}</td>
+            <td>${v.activa ? 'ACTIVA' : 'CERRADA'}</td>
+            <td><button class="btn" onclick="cambiarEstadoVacante(${v.id}, ${!v.activa})">${v.activa ? 'Cerrar' : 'Activar'}</button></td>
+        </tr>
+    `).join('');
+}
 
-<script>
+document.getElementById('formVacante').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = {
+        codigo: document.getElementById('v_codigo').value,
+        titulo: document.getElementById('v_titulo').value,
+        unidad: document.getElementById('v_unidad').value,
+        ciudad: document.getElementById('v_ciudad').value,
+        descripcion: document.getElementById('v_desc').value
+    };
+    const res = await fetch('/api/admin/vacantes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    if (res.ok) {
+        e.target.reset();
+        cargarVacantes();
+        alert('Vacante publicada correctamente.');
+    }
+});
+
+async function cambiarEstadoVacante(id, activa) {
+    await fetch(`/api/admin/vacantes/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ activa })
+    });
+    cargarVacantes();
+}
+
+async function cargarEvaluaciones() {
+    const res = await fetch('/api/admin/evaluaciones-desempeno');
+    if (!res.ok) return;
+    const data = await res.json();
+    document.getElementById('listaEvaluaciones').innerHTML = data.map(ev => `
+        <tr>
+            <td>${ev.colaborador}</td>
+            <td>${ev.cargo}</td>
+            <td>${ev.periodo}</td>
+            <td><strong>${ev.puntaje}</strong></td>
+            <td>${ev.observaciones || ''}</td>
+        </tr>
+    `).join('');
+}
+
+document.getElementById('formEvaluacion').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = {
+        colaborador: document.getElementById('ev_nombre').value,
+        cargo: document.getElementById('ev_cargo').value,
+        periodo: document.getElementById('ev_periodo').value,
+        puntaje: document.getElementById('ev_puntaje').value,
+        observaciones: document.getElementById('ev_obs').value
+    };
+    const res = await fetch('/api/admin/evaluaciones-desempeno', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+    });
+    if (res.ok) {
+        e.target.reset();
+        cargarEvaluaciones();
+        alert('Evaluación de desempeño registrada.');
+    }
+});
+
+// MÓDULO V2.0: CONFIABILIDAD (8F), 16PF Y ANTECEDENTES
 async function cargarModuloV2() {
     const res = await fetch('/api/admin/evaluaciones-resumen');
+    if (!res.ok) return;
     const lista = await res.json();
 
-    // Render Pestaña 4
-    let html4 = `<table style="width:100%; border-collapse:collapse; text-align:left;">
-        <tr style="border-bottom:1px solid #334155; color:#38bdf8;">
-            <th>Candidato</th><th>Pruebas a Asignar</th><th>Enlace Único</th><th>Resultado Confiabilidad (8F)</th><th>Resultado 16PF</th>
-        </tr>`;
+    let html4 = `<table><thead><tr>
+        <th>Candidato</th><th>Pruebas a Asignar</th><th>Enlace Único</th><th>Resultado Confiabilidad (8F)</th><th>Resultado 16PF</th>
+    </tr></thead><tbody>`;
+
     lista.forEach(c => {
         const link = c.token_acceso ? `${window.location.origin}/evaluacion.html?token=${c.token_acceso}` : '';
-        const resConf = c.indice_global ? `<strong>${c.indice_global}%</strong> (${c.nivel_riesgo})<br><small>Int:${c.puntaje_integridad}% | Rob:${c.puntaje_robo}% | Ver:${c.puntaje_mentira}% | Alc:${c.puntaje_alcohol_drogas}% | Mob:${c.puntaje_mobbing}% | Vio:${c.puntaje_violencia}% | IT:${c.puntaje_riesgo_informatico}% | Aco:${c.puntaje_acoso_sexual}%</small>` : (c.estado_confiabilidad || 'No asignado');
-        const res16 = c.ajuste_perfil ? `Ajuste: <strong>${c.ajuste_perfil}%</strong><br><small>Ext:${c.dimensiones_globales?.Extraversion} | Est:${c.dimensiones_globales?.Estabilidad_Ansiedad} | Ind:${c.dimensiones_globales?.Independencia} | Aut:${c.dimensiones_globales?.Autocontrol}</small>` : (c.estado_16pf || 'No asignado');
+        const resConf = c.indice_global
+            ? `<strong>${c.indice_global}%</strong> (${c.nivel_riesgo})<br><small>Int:${c.puntaje_integridad}% | Rob:${c.puntaje_robo}% | Ver:${c.puntaje_mentira}% | Alc:${c.puntaje_alcohol_drogas}% | Mob:${c.puntaje_mobbing}% | Vio:${c.puntaje_violencia}% | IT:${c.puntaje_riesgo_informatico}% | Aco:${c.puntaje_acoso_sexual}%</small>`
+            : (c.estado_confiabilidad || 'No asignado');
+        const res16 = c.ajuste_perfil
+            ? `Ajuste: <strong>${c.ajuste_perfil}%</strong><br><small>Ext:${c.dimensiones_globales?.Extraversion} | Est:${c.dimensiones_globales?.Estabilidad_Ansiedad} | Ind:${c.dimensiones_globales?.Independencia} | Aut:${c.dimensiones_globales?.Autocontrol}</small>`
+            : (c.estado_16pf || 'No asignado');
 
-        html4 += `<tr style="border-bottom:1px solid #1e293b;">
-            <td style="padding:10px;"><strong>${c.nombres} ${c.apellidos}</strong><br><small>${c.cargo_postulado}</small></td>
+        html4 += `<tr>
+            <td><strong>${c.nombres} ${c.apellidos}</strong><br><small>${c.cargo_postulado || ''}</small></td>
             <td>
                 <label><input type="checkbox" id="chk_conf_${c.id}" ${c.incluye_confiabilidad !== false ? 'checked' : ''}> Confiabilidad 8F</label><br>
                 <label><input type="checkbox" id="chk_16_${c.id}" ${c.incluye_16pf ? 'checked' : ''}> Perfil 16PF</label><br>
-                <button onclick="habilitarTest(${c.id})" style="margin-top:5px; padding:5px 10px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer;">Generar / Actualizar Link</button>
+                <button class="btn" style="margin-top:6px; padding:5px 10px;" onclick="habilitarTest(${c.id})">Generar Link</button>
             </td>
-            <td>${link ? `<input type="text" value="${link}" readonly style="width:180px; padding:4px;" onclick="this.select();document.execCommand('copy');alert('Enlace copiado');">` : 'Sin generar'}</td>
-            <td style="padding:8px;">${resConf}</td>
-            <td style="padding:8px;">${res16}</td>
+            <td>${link ? `<input type="text" value="${link}" readonly style="width:170px;" onclick="this.select();navigator.clipboard.writeText(this.value);alert('Enlace copiado');">` : 'Sin generar'}</td>
+            <td>${resConf}</td>
+            <td>${res16}</td>
         </tr>`;
     });
-    html4 += `</table><p style="font-size:0.8rem; color:#94a3b8; margin-top:15px;"><em>Nota Metodológica: Las evaluaciones psicométricas y de confiabilidad miden tendencias actitudinales, rasgos de personalidad y consistencia de respuesta; constituyen un criterio técnico de apoyo y no una afirmación determinante sobre conductas futuras.</em></p>`;
+    html4 += `</tbody></table><p style="font-size:0.8rem; color:var(--muted); margin-top:14px;"><em>Nota Metodológica: Las evaluaciones psicométricas y de confiabilidad miden tendencias actitudinales, rasgos de personalidad y consistencia de respuesta; constituyen un criterio técnico de apoyo y no una afirmación determinante sobre conductas futuras.</em></p>`;
     document.getElementById('tablaEvaluaciones').innerHTML = html4;
 
-    // Render Pestaña 5
-    let html5 = `<table style="width:100%; border-collapse:collapse; text-align:left;">
-        <tr style="border-bottom:1px solid #334155; color:#38bdf8;">
-            <th>Candidato</th><th>Penales (PDF)</th><th>Judiciales (PDF)</th><th>Académicos (PDF)</th><th>Observaciones y Guardar</th>
-        </tr>`;
+    let html5 = `<table><thead><tr>
+        <th>Candidato</th><th>Penales (PDF)</th><th>Judiciales (PDF)</th><th>Académicos (PDF)</th><th>Observaciones y Guardar</th>
+    </tr></thead><tbody>`;
+
     lista.forEach(c => {
-        html5 += `<tr style="border-bottom:1px solid #1e293b;">
-            <td style="padding:10px;"><strong>${c.nombres} ${c.apellidos}</strong><br>C.I.: ${c.cedula}</td>
+        html5 += `<tr>
+            <td><strong>${c.nombres} ${c.apellidos}</strong><br><small>C.I.: ${c.cedula}</small></td>
             <td>
                 <select id="est_pen_${c.id}"><option ${c.estado_penales==='PENDIENTE'?'selected':''}>PENDIENTE</option><option ${c.estado_penales==='SIN NOVEDAD'?'selected':''}>SIN NOVEDAD</option><option ${c.estado_penales==='CON OBSERVACION'?'selected':''}>CON OBSERVACION</option></select><br>
-                <input type="file" id="file_pen_${c.id}" accept="application/pdf" style="width:150px; margin-top:4px;">
-                ${c.pdf_penales_nombre ? `<br><a href="/api/admin/antecedentes/${c.id}/pdf/penales" target="_blank" style="color:#38bdf8;">📄 Ver PDF</a>` : ''}
+                <input type="file" id="file_pen_${c.id}" accept="application/pdf" style="width:160px; margin-top:5px;">
+                ${c.pdf_penales_nombre ? `<br><a href="/api/admin/antecedentes/${c.id}/pdf/penales" target="_blank" style="color:var(--primary);">📄 Ver PDF</a>` : ''}
             </td>
             <td>
                 <select id="est_jud_${c.id}"><option ${c.estado_judiciales==='PENDIENTE'?'selected':''}>PENDIENTE</option><option ${c.estado_judiciales==='SIN NOVEDAD'?'selected':''}>SIN NOVEDAD</option><option ${c.estado_judiciales==='CON OBSERVACION'?'selected':''}>CON OBSERVACION</option></select><br>
-                <input type="file" id="file_jud_${c.id}" accept="application/pdf" style="width:150px; margin-top:4px;">
-                ${c.pdf_judiciales_nombre ? `<br><a href="/api/admin/antecedentes/${c.id}/pdf/judiciales" target="_blank" style="color:#38bdf8;">📄 Ver PDF</a>` : ''}
+                <input type="file" id="file_jud_${c.id}" accept="application/pdf" style="width:160px; margin-top:5px;">
+                ${c.pdf_judiciales_nombre ? `<br><a href="/api/admin/antecedentes/${c.id}/pdf/judiciales" target="_blank" style="color:var(--primary);">📄 Ver PDF</a>` : ''}
             </td>
             <td>
                 <select id="est_aca_${c.id}"><option ${c.estado_academicos==='PENDIENTE'?'selected':''}>PENDIENTE</option><option ${c.estado_academicos==='VERIFICADO'?'selected':''}>VERIFICADO</option><option ${c.estado_academicos==='NO REGISTRADO'?'selected':''}>NO REGISTRADO</option></select><br>
-                <input type="file" id="file_aca_${c.id}" accept="application/pdf" style="width:150px; margin-top:4px;">
-                ${c.pdf_academicos_nombre ? `<br><a href="/api/admin/antecedentes/${c.id}/pdf/academicos" target="_blank" style="color:#38bdf8;">📄 Ver PDF</a>` : ''}
+                <input type="file" id="file_aca_${c.id}" accept="application/pdf" style="width:160px; margin-top:5px;">
+                ${c.pdf_academicos_nombre ? `<br><a href="/api/admin/antecedentes/${c.id}/pdf/academicos" target="_blank" style="color:var(--primary);">📄 Ver PDF</a>` : ''}
             </td>
             <td>
-                <textarea id="obs_ant_${c.id}" rows="2" placeholder="Notas de verificación..." style="width:160px;">${c.observaciones || ''}</textarea><br>
-                <button onclick="guardarAntecedentes(${c.id})" style="padding:5px 12px; background:#10b981; color:white; border:none; border-radius:4px; cursor:pointer;">Guardar</button>
+                <textarea id="obs_ant_${c.id}" rows="2" placeholder="Notas..." style="width:160px;">${c.observaciones || ''}</textarea><br>
+                <button class="btn btn-green" style="margin-top:4px; padding:5px 12px;" onclick="guardarAntecedentes(${c.id})">Guardar</button>
             </td>
         </tr>`;
     });
-    html5 += `</table>`;
+    html5 += `</tbody></table>`;
     document.getElementById('tablaAntecedentes').innerHTML = html5;
 }
 
@@ -372,8 +459,11 @@ async function guardarAntecedentes(id) {
     if (document.getElementById(`file_aca_${id}`).files[0]) fd.append('pdf_academicos', document.getElementById(`file_aca_${id}`).files[0]);
 
     const res = await fetch(`/api/admin/antecedentes/${id}`, { method: 'POST', body: fd });
-    if (res.ok) { alert('Antecedentes y respaldos guardados'); cargarModuloV2(); }
+    if (res.ok) {
+        alert('Antecedentes y respaldos guardados.');
+        cargarModuloV2();
+    }
 }
-
-cargarModuloV2();
 </script>
+</body>
+</html>
