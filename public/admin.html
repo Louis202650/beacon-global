@@ -267,3 +267,113 @@
   </script>
 </body>
 </html>
+<button onclick="mostrarTab('tab4')">4. Confiabilidad (8F) y 16PF</button>
+<button onclick="mostrarTab('tab5')">5. Verificación Antecedentes</button>
+<!-- PESTAÑA 4: EVALUACIONES PSICOMÉTRICAS OPCIONALES -->
+<div id="tab4" class="tab-content" style="display:none; background:#1c2541; padding:20px; border-radius:10px; margin-top:20px;">
+    <h2>4. Evaluaciones Opcionales para Terna (Confiabilidad 8 Factores + 16PF)</h2>
+    <p style="color:#94a3b8; font-size:0.9rem;">Active las pruebas únicamente para los candidatos opcionados. Al completarse, el puntaje sincroniza automáticamente la casilla <strong>T</strong>.</p>
+    <div id="tablaEvaluaciones">Cargando candidatos...</div>
+</div>
+
+<!-- PESTAÑA 5: DEBIDA DILIGENCIA Y ANTECEDENTES EN LÍNEA (ECUADOR) -->
+<div id="tab5" class="tab-content" style="display:none; background:#1c2541; padding:20px; border-radius:10px; margin-top:20px;">
+    <h2>5. Verificación de Antecedentes en Línea y Respaldo PDF</h2>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+        <a href="https://certificados.ministeriodelinterior.gob.ec/gestorcertificados/antecedentes/" target="_blank" style="background:#0284c7; color:white; padding:10px 15px; border-radius:6px; text-decoration:none; font-weight:bold;">🔍 Consultar Antecedentes Penales (Min. Interior)</a>
+        <a href="https://procesosjudiciales.funcionjudicial.gob.ec/busqueda-filtros" target="_blank" style="background:#0284c7; color:white; padding:10px 15px; border-radius:6px; text-decoration:none; font-weight:bold;">⚖️ Consultar Procesos Judiciales (SATJE)</a>
+        <a href="https://www.senescyt.gob.ec/consulta-titulos-web/faces/vista/consulta/consulta.xhtml" target="_blank" style="background:#0284c7; color:white; padding:10px 15px; border-radius:6px; text-decoration:none; font-weight:bold;">🎓 Consultar Títulos Académicos (SENESCYT)</a>
+    </div>
+    <div id="tablaAntecedentes">Cargando registros...</div>
+</div>
+
+<script>
+async function cargarModuloV2() {
+    const res = await fetch('/api/admin/evaluaciones-resumen');
+    const lista = await res.json();
+
+    // Render Pestaña 4
+    let html4 = `<table style="width:100%; border-collapse:collapse; text-align:left;">
+        <tr style="border-bottom:1px solid #334155; color:#38bdf8;">
+            <th>Candidato</th><th>Pruebas a Asignar</th><th>Enlace Único</th><th>Resultado Confiabilidad (8F)</th><th>Resultado 16PF</th>
+        </tr>`;
+    lista.forEach(c => {
+        const link = c.token_acceso ? `${window.location.origin}/evaluacion.html?token=${c.token_acceso}` : '';
+        const resConf = c.indice_global ? `<strong>${c.indice_global}%</strong> (${c.nivel_riesgo})<br><small>Int:${c.puntaje_integridad}% | Rob:${c.puntaje_robo}% | Ver:${c.puntaje_mentira}% | Alc:${c.puntaje_alcohol_drogas}% | Mob:${c.puntaje_mobbing}% | Vio:${c.puntaje_violencia}% | IT:${c.puntaje_riesgo_informatico}% | Aco:${c.puntaje_acoso_sexual}%</small>` : (c.estado_confiabilidad || 'No asignado');
+        const res16 = c.ajuste_perfil ? `Ajuste: <strong>${c.ajuste_perfil}%</strong><br><small>Ext:${c.dimensiones_globales?.Extraversion} | Est:${c.dimensiones_globales?.Estabilidad_Ansiedad} | Ind:${c.dimensiones_globales?.Independencia} | Aut:${c.dimensiones_globales?.Autocontrol}</small>` : (c.estado_16pf || 'No asignado');
+
+        html4 += `<tr style="border-bottom:1px solid #1e293b;">
+            <td style="padding:10px;"><strong>${c.nombres} ${c.apellidos}</strong><br><small>${c.cargo_postulado}</small></td>
+            <td>
+                <label><input type="checkbox" id="chk_conf_${c.id}" ${c.incluye_confiabilidad !== false ? 'checked' : ''}> Confiabilidad 8F</label><br>
+                <label><input type="checkbox" id="chk_16_${c.id}" ${c.incluye_16pf ? 'checked' : ''}> Perfil 16PF</label><br>
+                <button onclick="habilitarTest(${c.id})" style="margin-top:5px; padding:5px 10px; background:#0284c7; color:white; border:none; border-radius:4px; cursor:pointer;">Generar / Actualizar Link</button>
+            </td>
+            <td>${link ? `<input type="text" value="${link}" readonly style="width:180px; padding:4px;" onclick="this.select();document.execCommand('copy');alert('Enlace copiado');">` : 'Sin generar'}</td>
+            <td style="padding:8px;">${resConf}</td>
+            <td style="padding:8px;">${res16}</td>
+        </tr>`;
+    });
+    html4 += `</table><p style="font-size:0.8rem; color:#94a3b8; margin-top:15px;"><em>Nota Metodológica: Las evaluaciones psicométricas y de confiabilidad miden tendencias actitudinales, rasgos de personalidad y consistencia de respuesta; constituyen un criterio técnico de apoyo y no una afirmación determinante sobre conductas futuras.</em></p>`;
+    document.getElementById('tablaEvaluaciones').innerHTML = html4;
+
+    // Render Pestaña 5
+    let html5 = `<table style="width:100%; border-collapse:collapse; text-align:left;">
+        <tr style="border-bottom:1px solid #334155; color:#38bdf8;">
+            <th>Candidato</th><th>Penales (PDF)</th><th>Judiciales (PDF)</th><th>Académicos (PDF)</th><th>Observaciones y Guardar</th>
+        </tr>`;
+    lista.forEach(c => {
+        html5 += `<tr style="border-bottom:1px solid #1e293b;">
+            <td style="padding:10px;"><strong>${c.nombres} ${c.apellidos}</strong><br>C.I.: ${c.cedula}</td>
+            <td>
+                <select id="est_pen_${c.id}"><option ${c.estado_penales==='PENDIENTE'?'selected':''}>PENDIENTE</option><option ${c.estado_penales==='SIN NOVEDAD'?'selected':''}>SIN NOVEDAD</option><option ${c.estado_penales==='CON OBSERVACION'?'selected':''}>CON OBSERVACION</option></select><br>
+                <input type="file" id="file_pen_${c.id}" accept="application/pdf" style="width:150px; margin-top:4px;">
+                ${c.pdf_penales_nombre ? `<br><a href="/api/admin/antecedentes/${c.id}/pdf/penales" target="_blank" style="color:#38bdf8;">📄 Ver PDF</a>` : ''}
+            </td>
+            <td>
+                <select id="est_jud_${c.id}"><option ${c.estado_judiciales==='PENDIENTE'?'selected':''}>PENDIENTE</option><option ${c.estado_judiciales==='SIN NOVEDAD'?'selected':''}>SIN NOVEDAD</option><option ${c.estado_judiciales==='CON OBSERVACION'?'selected':''}>CON OBSERVACION</option></select><br>
+                <input type="file" id="file_jud_${c.id}" accept="application/pdf" style="width:150px; margin-top:4px;">
+                ${c.pdf_judiciales_nombre ? `<br><a href="/api/admin/antecedentes/${c.id}/pdf/judiciales" target="_blank" style="color:#38bdf8;">📄 Ver PDF</a>` : ''}
+            </td>
+            <td>
+                <select id="est_aca_${c.id}"><option ${c.estado_academicos==='PENDIENTE'?'selected':''}>PENDIENTE</option><option ${c.estado_academicos==='VERIFICADO'?'selected':''}>VERIFICADO</option><option ${c.estado_academicos==='NO REGISTRADO'?'selected':''}>NO REGISTRADO</option></select><br>
+                <input type="file" id="file_aca_${c.id}" accept="application/pdf" style="width:150px; margin-top:4px;">
+                ${c.pdf_academicos_nombre ? `<br><a href="/api/admin/antecedentes/${c.id}/pdf/academicos" target="_blank" style="color:#38bdf8;">📄 Ver PDF</a>` : ''}
+            </td>
+            <td>
+                <textarea id="obs_ant_${c.id}" rows="2" placeholder="Notas de verificación..." style="width:160px;">${c.observaciones || ''}</textarea><br>
+                <button onclick="guardarAntecedentes(${c.id})" style="padding:5px 12px; background:#10b981; color:white; border:none; border-radius:4px; cursor:pointer;">Guardar</button>
+            </td>
+        </tr>`;
+    });
+    html5 += `</table>`;
+    document.getElementById('tablaAntecedentes').innerHTML = html5;
+}
+
+async function habilitarTest(id) {
+    const incluye_confiabilidad = document.getElementById(`chk_conf_${id}`).checked;
+    const incluye_16pf = document.getElementById(`chk_16_${id}`).checked;
+    await fetch('/api/admin/habilitar-test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postulante_id: id, incluye_confiabilidad, incluye_16pf })
+    });
+    cargarModuloV2();
+}
+
+async function guardarAntecedentes(id) {
+    const fd = new FormData();
+    fd.append('estado_penales', document.getElementById(`est_pen_${id}`).value);
+    fd.append('estado_judiciales', document.getElementById(`est_jud_${id}`).value);
+    fd.append('estado_academicos', document.getElementById(`est_aca_${id}`).value);
+    fd.append('observaciones', document.getElementById(`obs_ant_${id}`).value);
+    if (document.getElementById(`file_pen_${id}`).files[0]) fd.append('pdf_penales', document.getElementById(`file_pen_${id}`).files[0]);
+    if (document.getElementById(`file_jud_${id}`).files[0]) fd.append('pdf_judiciales', document.getElementById(`file_jud_${id}`).files[0]);
+    if (document.getElementById(`file_aca_${id}`).files[0]) fd.append('pdf_academicos', document.getElementById(`file_aca_${id}`).files[0]);
+
+    const res = await fetch(`/api/admin/antecedentes/${id}`, { method: 'POST', body: fd });
+    if (res.ok) { alert('Antecedentes y respaldos guardados'); cargarModuloV2(); }
+}
+
+cargarModuloV2();
+</script>
