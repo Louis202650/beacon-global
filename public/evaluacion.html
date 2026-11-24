@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beacon Global | Evaluación Psicométrica y de Confiabilidad</title>
+    <style>
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0b132b; color: #f8fafc; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #1c2541; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        h1, h2, h3 { color: #38bdf8; margin-top: 0; }
+        .badge { background: #0284c7; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; display: inline-block; margin-bottom: 15px; }
+        .card { background: #0f172a; padding: 18px; border-radius: 8px; margin-bottom: 14px; border-left: 4px solid #38bdf8; }
+        .pregunta { font-weight: 600; margin-bottom: 12px; font-size: 1rem; }
+        .opciones { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        label.opt { background: #1e293b; padding: 10px 14px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1px solid #334155; }
+        label.opt:hover { border-color: #38bdf8; }
+        button { background: #0284c7; color: white; border: none; padding: 14px 28px; font-size: 1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 20px; }
+        button:hover { background: #0369a1; }
+        .aviso { background: #1e293b; padding: 15px; border-radius: 8px; font-size: 0.9rem; color: #cbd5e1; margin-bottom: 20px; border: 1px solid #334155; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <span class="badge">BEACON GLOBAL • EVALUACIÓN INTEGRAL DE TALENTO</span>
+    <h1>Evaluación Técnica y Psicométrica</h1>
+    <div id="infoCandidato" class="aviso">Validando enlace de evaluación...</div>
+    <form id="formEvaluacion" style="display:none;">
+        <div id="seccionConfiabilidad" style="display:none;">
+            <h2>Módulo I: Escala de Confiabilidad y Ética Laboral</h2>
+            <p class="aviso">Responda con total sinceridad según su criterio habitual en el trabajo. No existen respuestas "trampa", pero el sistema evalúa la consistencia de sus respuestas.</p>
+            <div id="listaConfiabilidad"></div>
+        </div>
+
+        <div id="seccion16PF" style="display:none; margin-top: 30px;">
+            <h2>Módulo II: Inventario de 16 Factores de Personalidad Laboral</h2>
+            <p class="aviso">Seleccione la opción que mejor describa su forma natural de actuar o pensar en el ámbito profesional.</p>
+            <div id="lista16PF"></div>
+        </div>
+
+        <button type="submit">Finalizar y Enviar Evaluación</button>
+    </form>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const token = params.get('token');
+
+// 40 Reactivos de Confiabilidad (5 por cada uno de los 8 factores; inv=true invierte puntaje)
+const itemsConfiabilidad = [
+    // Integridad
+    { f: 'integridad', inv: false, t: '1. Las normas internas de una empresa deben cumplirse incluso cuando ningún supervisor está mirando.' },
+    { f: 'integridad', inv: true,  t: '2. Si un procedimiento administrativo retrasa una entrega, es aceptable saltárselo para cumplir la meta.' },
+    { f: 'integridad', inv: false, t: '3. Admitir un error propio ante un jefe inmediato es preferible a ocultarlo esperando que nadie lo note.' },
+    { f: 'integridad', inv: true,  t: '4. En el entorno laboral actual, ser completamente honesto en cada reporte suele perjudicar al trabajador.' },
+    { f: 'integridad', inv: false, t: '5. Si detecto que un proveedor ofrece un beneficio personal a cambio de agilizar un trámite, lo reporto de inmediato.' },
+    // Robo
+    { f: 'robo', inv: true,  t: '6. Llevarse artículos menores de oficina o insumos sobrantes a casa no representa un perjuicio real para una empresa.' },
+    { f: 'robo', inv: false, t: '7. Los bienes, herramientas y presupuestos asignados al cargo deben usarse exclusivamente para fines laborales.' },
+    { f: 'robo', inv: true,  t: '8. Cuando una empresa paga salarios bajos, es comprensible que algunos empleados compensen tomando pequeños recursos.' },
+    { f: 'robo', inv: false, t: '9. Si encuentro dinero o un objeto de valor olvidado en un área común de la empresa, lo entrego de inmediato a seguridad.' },
+    { f: 'robo', inv: true,  t: '10. Reportar el uso indebido de inventario por parte de un compañero cercano es una falta de lealtad.' },
+    // Mentira / Deseabilidad social (puntúa alto si responde con honestidad humana realista)
+    { f: 'mentira', inv: true, t: '11. Nunca en toda mi vida he llegado tarde a un compromiso ni he postergado una tarea.' },
+    { f: 'mentira', inv: true, t: '12. Jamás he sentido irritación o molestia cuando alguien me critica en el trabajo o en el estudio.' },
+    { f: 'mentira', inv: true, t: '13. Siempre cumplo absolutamente todas las normas de tránsito o convivencia sin excepción alguna.' },
+    { f: 'mentira', inv: true, t: '14. Nunca he hablado mal de otra persona ni he comentado un rumor en ningún entorno.' },
+    { f: 'mentira', inv: true, t: '15. En todas mis actividades pasadas, jamás he cometido un error por descuido.' },
+    // Alcohol y Drogas
+    { f: 'alcohol_drogas', inv: true,  t: '16. Presentarse a trabajar con resaca leve no afecta el desempeño si uno conoce bien sus funciones.' },
+    { f: 'alcohol_drogas', inv: false, t: '17. El consumo de alcohol o sustancias psicotrópicas durante la jornada laboral es incompatible con cualquier puesto.' },
+    { f: 'alcohol_drogas', inv: true,  t: '18. Consumir sustancias recreativas fuera del horario laboral es un asunto privado que jamás repercute en la seguridad laboral.' },
+    { f: 'alcohol_drogas', inv: false, t: '19. Estoy de acuerdo con que la empresa realice pruebas preventivas de alcohol y drogas.' },
+    { f: 'alcohol_drogas', inv: true,  t: '20. En celebraciones laborales es normal excederse con el alcohol aunque al día siguiente haya jornada.' },
+    // Mobbing
+    { f: 'mobbing', inv: false, t: '21. Un líder o compañero debe corregir fallas técnicas sin recurrir a humillaciones ni descalificaciones.' },
+    { f: 'mobbing', inv: true,  t: '22. Aislar o ignorar a un compañero nuevo que no se adapta rápido es una forma válida de presionarlo.' },
+    { f: 'mobbing', inv: false, t: '23. Todo trabajador tiene derecho a expresar desacuerdos laborales con respeto sin temor a represalias.' },
+    { f: 'mobbing', inv: true,  t: '24. Asignar tareas imposibles para que alguien renuncie por sí solo es una práctica aceptable.' },
+    { f: 'mobbing', inv: false, t: '25. Si presencio burlas sistemáticas hacia un compañero, lo comunico por los canales formales.' },
+    // Violencia
+    { f: 'violencia', inv: false, t: '26. Ante una discusión acalorada con un cliente o compañero, mantengo un tono de voz controlado.' },
+    { f: 'violencia', inv: true,  t: '27. Cuando alguien te falta el respeto frente a otros, responder con agresividad verbal es necesario.' },
+    { f: 'violencia', inv: false, t: '28. Bajo alta presión laboral logro canalizar la frustración sin golpear objetos ni alzar la voz.' },
+    { f: 'violencia', inv: true,  t: '29. Hay situaciones de injusticia laboral donde una amenaza física o verbal resulta comprensible.' },
+    { f: 'violencia', inv: false, t: '30. Prefiero solicitar una pausa antes que continuar una conversación cuando los ánimos están exaltados.' },
+    // Riesgo Informático
+    { f: 'riesgo_informatico', inv: false, t: '31. Las contraseñas corporativas son personales e intransferibles, incluso frente a compañeros.' },
+    { f: 'riesgo_informatico', inv: true,  t: '32. Guardar bases de datos de clientes en un correo personal facilita trabajar desde casa sin riesgos.' },
+    { f: 'riesgo_informatico', inv: false, t: '33. Al desvincularme de una empresa, toda información o base de datos generada pertenece a la organización.' },
+    { f: 'riesgo_informatico', inv: true,  t: '34. Instalar programas no autorizados en el equipo de la empresa es aceptable si agiliza el trabajo.' },
+    { f: 'riesgo_informatico', inv: false, t: '35. Bloqueo siempre mi sesión de computadora cada vez que me levanto de mi puesto.' },
+    // Acoso Sexual
+    { f: 'acoso_sexual', inv: false, t: '36. El entorno laboral exige mantener límites estrictamente profesionales sobre la apariencia física o vida íntima.' },
+    { f: 'acoso_sexual', inv: true,  t: '37. Los elogios o bromas de doble sentido en la oficina son parte normal de la confianza entre compañeros.' },
+    { f: 'acoso_sexual', inv: false, t: '38. Cualquier insinuación o contacto físico no consentido constituye una falta grave que debe sancionarse.' },
+    { f: 'acoso_sexual', inv: true,  t: '39. Cuando alguien recibe un comentario incómodo en el trabajo, lo mejor es ignorarlo para evitar conflictos.' },
+    { f: 'acoso_sexual', inv: false, t: '40. Una relación jerárquica nunca debe utilizarse para solicitar favores personales o afectivos.' }
+];
+
+// 32 Reactivos estructurados para los 16 Factores Primarios de Cattell (2 reactivos clave por factor)
+const items16PF = [
+    { f: 'A', t: 'Prefiero trabajar en equipo conversando con compañeros antes que hacerlo en solitario.' },
+    { f: 'A', t: 'Me resulta fácil iniciar conversaciones cordiales con personas que acabo de conocer.' },
+    { f: 'B', t: 'Disfruto resolviendo problemas complejos que requieren análisis lógico y abstracción.' },
+    { f: 'B', t: 'Identifico con rapidez patrones o inconsistencias en informes numéricos o escritos.' },
+    { f: 'C', t: 'Mantengo la calma y la objetividad incluso cuando surgen imprevistos urgentes en el trabajo.' },
+    { f: 'C', t: 'Rara vez permito que un mal día afecte mi trato con los demás o mi rendimiento.' },
+    { f: 'E', t: 'Cuando estoy convencido de una idea, la defiendo con firmeza aunque la mayoría opine distinto.' },
+    { f: 'E', t: 'Me siento cómodo asumiendo el mando y tomando decisiones difíciles en un grupo.' },
+    { f: 'F', t: 'Suelo aportar entusiasmo, dinamismo y buen humor en las reuniones de trabajo.' },
+    { f: 'F', t: 'Me adapto con espontaneidad cuando cambian los planes de último momento.' },
+    { f: 'G', t: 'Considero indispensable seguir al pie de la letra los reglamentos y procedimientos establecidos.' },
+    { f: 'G', t: 'Me esfuerzo por terminar cada tarea con rigor aunque nadie supervise los detalles.' },
+    { f: 'H', t: 'Me siento seguro al exponer proyectos o hablar en público frente a directivos.' },
+    { f: 'H', t: 'No me intimida asumir retos nuevos en entornos desconocidos.' },
+    { f: 'I', t: 'Al tomar decisiones laborales, doy gran importancia al impacto humano y emocional en el equipo.' },
+    { f: 'I', t: 'Percibo con facilidad el estado de ánimo de las personas que me rodean.' },
+    { f: 'L', t: 'Prefiero verificar los hechos por mi cuenta antes de confiar plenamente en promesas de terceros.' },
+    { f: 'L', t: 'Analizo con cautela las intenciones detrás de una propuesta aparentemente muy favorable.' },
+    { f: 'M', t: 'Me atraen más las ideas estratégicas e innovadoras que las tareas operativas rutinarias.' },
+    { f: 'M', t: 'Con frecuencia propongo enfoques creativos poco convencionales para mejorar procesos.' },
+    { f: 'N', t: 'Suelo ser reservado con mi vida personal y cuidadoso con lo que expreso en el entorno laboral.' },
+    { f: 'N', t: 'Antes de opinar en una negociación, analizo estratégicamente qué conviene decir.' },
+    { f: 'O', t: 'Suelo reflexionar bastante sobre mis decisiones por temor a haber pasado algo por alto.' },
+    { f: 'O', t: 'Las críticas a mi desempeño me generan preocupación prolongada.' },
+    { f: 'Q1', t: 'Me entusiasma probar nuevas tecnologías y métodos modernos de trabajo.' },
+    { f: 'Q1', t: 'Cuestiono los métodos tradicionales cuando creo que pueden optimizarse.' },
+    { f: 'Q2', t: 'Prefiero tomar mis propias decisiones sin depender de la aprobación del grupo.' },
+    { f: 'Q2', t: 'Trabajo con máxima eficiencia cuando tengo autonomía para organizar mi propia agenda.' },
+    { f: 'Q3', t: 'Mantengo mis archivos, pendientes y horarios estrictamente ordenados y planificados.' },
+    { f: 'Q3', t: 'Me incomoda dejar asuntos pendientes o trabajar sin una estructura clara.' },
+    { f: 'Q4', t: 'Suelo sentir impaciencia cuando los procesos o las personas avanzan con lentitud.' },
+    { f: 'Q4', t: 'Me cuesta desconectarme mentalmente de las presiones del trabajo al llegar a casa.' }
+];
+
+let configData = null;
+
+async function iniciar() {
+    if (!token) {
+        document.getElementById('infoCandidato').innerText = 'Error: Enlace sin token de acceso.';
+        return;
+    }
+    const res = await fetch(`/api/evaluacion/${token}`);
+    if (!res.ok) {
+        document.getElementById('infoCandidato').innerText = 'Enlace inválido o expirado. Contacte a Beacon Global.';
+        return;
+    }
+    configData = await res.json();
+    document.getElementById('infoCandidato').innerHTML = `
+        <strong>Evaluado:</strong> ${configData.nombres} ${configData.apellidos} (C.I. ${configData.cedula})<br>
+        <strong>Cargo:</strong> ${configData.cargo_postulado}
+    `;
+    document.getElementById('formEvaluacion').style.display = 'block';
+
+    if (configData.incluye_confiabilidad && configData.estado_confiabilidad !== 'COMPLETADO') {
+        document.getElementById('seccionConfiabilidad').style.display = 'block';
+        const cont = document.getElementById('listaConfiabilidad');
+        itemsConfiabilidad.forEach((item, idx) => {
+            cont.innerHTML += `
+                <div class="card">
+                    <div class="pregunta">${item.t}</div>
+                    <div class="opciones">
+                        <label class="opt"><input type="radio" name="conf_${idx}" value="1" required> Totalmente en desacuerdo</label>
+                        <label class="opt"><input type="radio" name="conf_${idx}" value="2"> En desacuerdo</label>
+                        <label class="opt"><input type="radio" name="conf_${idx}" value="3"> De acuerdo</label>
+                        <label class="opt"><input type="radio" name="conf_${idx}" value="4"> Totalmente de acuerdo</label>
+                    </div>
+                </div>`;
+        });
+    }
+
+    if (configData.incluye_16pf && configData.estado_16pf !== 'COMPLETADO') {
+        document.getElementById('seccion16PF').style.display = 'block';
+        const cont16 = document.getElementById('lista16PF');
+        items16PF.forEach((item, idx) => {
+            cont16.innerHTML += `
+                <div class="card">
+                    <div class="pregunta">${idx + 1}. ${item.t}</div>
+                    <div class="opciones">
+                        <label class="opt"><input type="radio" name="pf_${idx}" value="3" required> A. De acuerdo</label>
+                        <label class="opt"><input type="radio" name="pf_${idx}" value="2"> B. Término medio / Indeciso</label>
+                        <label class="opt"><input type="radio" name="pf_${idx}" value="1"> C. En desacuerdo</label>
+                    </div>
+                </div>`;
+        });
+    }
+}
+
+document.getElementById('formEvaluacion').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {};
+
+    if (document.getElementById('seccionConfiabilidad').style.display === 'block') {
+        const sumas = { integridad:0, robo:0, mentira:0, alcohol_drogas:0, mobbing:0, violencia:0, riesgo_informatico:0, acoso_sexual:0 };
+        itemsConfiabilidad.forEach((item, idx) => {
+            let val = parseInt(document.querySelector(`input[name="conf_${idx}"]:checked`).value);
+            if (item.inv) val = 5 - val; // Invertir escala 1-4
+            sumas[item.f] += val;
+        });
+        // Convertir cada factor (5 a 20 pts) a escala porcentual 0-100%
+        const pct = {};
+        let total = 0;
+        for (const k in sumas) {
+            pct[k] = Number((((sumas[k] - 5) / 15) * 100).toFixed(1));
+            total += pct[k];
+        }
+        const indice = Number((total / 8).toFixed(1));
+        const riesgo = indice >= 80 ? 'BAJO' : (indice >= 60 ? 'MODERADO' : 'ALTO');
+        payload.confiabilidad = { ...pct, indice_global: indice, nivel_riesgo: riesgo };
+    }
+
+    if (document.getElementById('seccion16PF').style.display === 'block') {
+        const raw = {};
+        items16PF.forEach((item, idx) => {
+            const val = parseInt(document.querySelector(`input[name="pf_${idx}"]:checked`).value);
+            raw[item.f] = (raw[item.f] || 0) + val; // Rango 2 a 6
+        });
+        const decatipos = {};
+        for (const f in raw) {
+            decatipos[f] = Math.min(10, Math.max(1, Math.round(((raw[f] - 2) / 4) * 9 + 1)));
+        }
+        const dimensiones = {
+            Extraversion: Number(((decatipos.A + decatipos.F + decatipos.H + (11 - decatipos.N) + (11 - decatipos.Q2)) / 5).toFixed(1)),
+            Estabilidad_Ansiedad: Number(((decatipos.C + (11 - decatipos.L) + (11 - decatipos.O) + (11 - decatipos.Q4)) / 4).toFixed(1)),
+            Dureza_Objetividad: Number((((11 - decatipos.A) + (11 - decatipos.I) + (11 - decatipos.M) + (11 - decatipos.Q1)) / 4).toFixed(1)),
+            Independencia: Number(((decatipos.E + decatipos.H + decatipos.L + decatipos.Q1) / 4).toFixed(1)),
+            Autocontrol: Number(((decatipos.G + decatipos.Q3 + (11 - decatipos.F) + (11 - decatipos.M)) / 4).toFixed(1))
+        };
+        const ajuste_perfil = Number((((dimensiones.Extraversion + dimensiones.Estabilidad_Ansiedad + dimensiones.Independencia + dimensiones.Autocontrol) / 4) * 10).toFixed(1));
+        payload.personalidad16 = { decatipos, dimensiones, ajuste_perfil };
+    }
+
+    const res = await fetch(`/api/evaluacion/${token}/guardar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+    });
+
+    if (res.ok) {
+        document.querySelector('.container').innerHTML = `
+            <h2>✓ Evaluación Registrada Exitosamente</h2>
+            <p class="aviso">Sus respuestas han sido encriptadas y enviadas al equipo de Selección de <strong>Beacon Global</strong>. Ya puede cerrar esta ventana.</p>
+        `;
+    } else {
+        alert('Ocurrió un error al guardar la evaluación.');
+    }
+});
+
+iniciar();
+</script>
+</body>
+</html>
