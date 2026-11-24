@@ -300,9 +300,18 @@ async function cargarVacantes() {
             <td>${v.titulo}</td>
             <td>${v.ciudad || ''}</td>
             <td>${v.activa ? 'ACTIVA' : 'CERRADA'}</td>
-            <td><button class="btn" onclick="cambiarEstadoVacante(${v.id}, ${!v.activa})">${v.activa ? 'Cerrar' : 'Activar'}</button></td>
+            <td>
+                <button class="btn" onclick="cambiarEstadoVacante(${v.id}, ${!v.activa})">${v.activa ? 'Cerrar' : 'Activar'}</button>
+                <button class="btn" style="background:#dc2626; margin-left:6px;" onclick="eliminarVacante(${v.id})">Eliminar</button>
+            </td>
         </tr>
     `).join('');
+}
+
+async function eliminarVacante(id) {
+    if (!confirm('¿Desea eliminar esta vacante permanentemente?')) return;
+    const res = await fetch(`/api/admin/vacantes/${id}`, { method: 'DELETE' });
+    if (res.ok) cargarVacantes();
 }
 
 document.getElementById('formVacante').addEventListener('submit', async (e) => {

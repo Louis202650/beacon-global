@@ -484,6 +484,24 @@ app.get('/api/admin/antecedentes/:id/pdf/:tipo', async (req, res) => {
     } catch (err) {
         res.status(500).send(err.message);
     }
+});// Eliminar una vacante definitivamente
+app.delete('/api/admin/vacantes/:id', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM vacantes WHERE id = $1', [req.params.id]);
+        res.json({ ok: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Eliminar una postulación de prueba definitivamente
+app.delete('/api/admin/postulantes/:id', async (req, res) => {
+    try {
+        await pool.query('DELETE FROM postulantes WHERE id = $1', [req.params.id]);
+        res.json({ ok: true });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 app.listen(PORT, () => {
   console.log(`🚀 Beacon Global activo en http://localhost:${PORT}`);
