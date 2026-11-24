@@ -74,6 +74,8 @@
         .btn:hover { background: var(--primary-hover); }
         .btn-green { background: #10b981; }
         .btn-green:hover { background: #059669; }
+        .btn-red { background: #dc2626; }
+        .btn-red:hover { background: #b91c1c; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; }
         th {
             background: #0b132b;
@@ -218,10 +220,8 @@ let claveAdmin = '';
 
 async function iniciarSesion() {
     const pass = document.getElementById('adminPass').value;
-    const res = await fetch('/api/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: pass })
+    const res = await fetch('/api/admin/postulantes', {
+        headers: { 'x-admin-pass': pass }
     });
     if (res.ok) {
         claveAdmin = pass;
@@ -244,8 +244,11 @@ function mostrarTab(tabId, btn) {
 }
 
 async function cargarPostulantes() {
-    const res = await fetch('/api/admin/postulantes');
-    const data = await res.json();
+    const res = await fetch('/api/admin/postulantes', {
+        headers: { 'x-admin-pass': claveAdmin }
+    });
+    const raw = await res.json();
+    const data = Array.isArray(raw) ? raw : (raw.postulantes || []);
     const tbody = document.getElementById('listaPostulantes');
     if (!data.length) {
         tbody.innerHTML = '<tr><td colspan="7">No hay postulantes registrados aún.</td></tr>';
@@ -253,7 +256,7 @@ async function cargarPostulantes() {
     }
     tbody.innerHTML = data.map(p => `
         <tr>
-            <td><strong>${p.cargo_postulado || ''}</strong></td>
+            <td><strong>${p.cargo_postulado || p.titulo_puesto || ''}</strong></td>
             <td><strong>${p.nombres} ${p.apellidos}</strong><br><small>C.I.: ${p.cedula}</small><br><small>Ciudad: ${p.ciudad || ''}</small></td>
             <td>${p.profesion || ''}<br><small>📧 ${p.email}</small><br><small>📱 ${p.telefono || ''}</small></td>
             <td>${p.archivo_nombre ? `<a href="/api/admin/postulantes/${p.id}/pdf" target="_blank" class="btn">📄 ${p.archivo_nombre}</a>` : 'Sin archivo'}</td>
@@ -285,69 +288,80 @@ async function guardarPostulante(id) {
     };
     const res = await fetch(`/api/admin/postulantes/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
         body: JSON.stringify(body)
     });
     if (res.ok) alert('Calificación y estado actualizados.');
 }
 
 async function cargarVacantes() {
-    const res = await fetch('/api/vacantes');
-    const data = await res.json();
-    document.getElementById('listaVacantes').innerHTML = data.map(v => `
+    const res = await fetch('/api/admin/vacantes', {
+        headers: { 'x-admin-pass': claveAdmin }
+    });
+    const raw = await res.json();
+    const lista = Array.isArray(raw) ? raw : (raw.vacantes || []);
+    document.getElementById('listaVacantes').innerHTML = lista.map(v => `
         <tr>
             <td><strong>${v.codigo}</strong></td>
-            <td>${v.titulo}</td>
+            <td>${v.titulo_puesto || v.titulo || ''}</td>
             <td>${v.ciudad || ''}</td>
-            <td>${v.activa ? 'ACTIVA' : 'CERRADA'}</td>
+            <td>${v.estado || 'ABIERTA'}</td>
             <td>
-                <button class="btn" onclick="cambiarEstadoVacante(${v.id}, ${!v.activa})">${v.activa ? 'Cerrar' : 'Activar'}</button>
-                <button class="btn" style="background:#dc2626; margin-left:6px;" onclick="eliminarVacante(${v.id})">Eliminar</button>
+                <button class="btn" onclick="cambiarEstadoVacante(${v.id}, '${v.estado === 'ABIERTA' ? 'CERRADA' : 'ABIERTA'}')">${v.estado === 'ABIERTA' ? 'Cerrar' : 'Activar'}</button>
+                <button class="btn btn-red" style="margin-left:6px;" onclick="eliminarVacante(${v.id})">Eliminar</button>
             </td>
         </tr>
     `).join('');
-}
-
-async function eliminarVacante(id) {
-    if (!confirm('¿Desea eliminar esta vacante permanentemente?')) return;
-    const res = await fetch(`/api/admin/vacantes/${id}`, { method: 'DELETE' });
-    if (res.ok) cargarVacantes();
 }
 
 document.getElementById('formVacante').addEventListener('submit', async (e) => {
     e.preventDefault();
     const body = {
         codigo: document.getElementById('v_codigo').value,
-        titulo: document.getElementById('v_titulo').value,
-        unidad: document.getElementById('v_unidad').value,
+        titulo_puesto: document.getElementById('v_titulo').value,
+        unidad_area: document.getElementById('v_unidad').value,
         ciudad: document.getElementById('v_ciudad').value,
         descripcion: document.getElementById('v_desc').value
     };
     const res = await fetch('/api/admin/vacantes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
         body: JSON.stringify(body)
     });
     if (res.ok) {
         e.target.reset();
         cargarVacantes();
         alert('Vacante publicada correctamente.');
+    } else {
+        alert('No se pudo publicar. Verifica que el código no esté repetido.');
     }
 });
 
-async function cambiarEstadoVacante(id, activa) {
+async function cambiarEstadoVacante(id, estado) {
     await fetch(`/api/admin/vacantes/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ activa })
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
+        body: JSON.stringify({ estado })
     });
     cargarVacantes();
 }
 
+async function eliminarVacante(id) {
+    if (!confirm('¿Eliminar esta vacante permanentemente?')) return;
+    const res = await fetch(`/api/admin/vacantes/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-pass': claveAdmin }
+    });
+    if (res.ok) cargarVacantes();
+}
+
 async function cargarEvaluaciones() {
-    const res = await fetch('/api/admin/evaluaciones-desempeno');
+    const res = await fetch('/api/admin/evaluaciones-desempeno', {
+        headers: { 'x-admin-pass': claveAdmin }
+    });
     if (!res.ok) return;
-    const data = await res.json();
+    const raw = await res.json();
+    const data = Array.isArray(raw) ? raw : (raw.evaluaciones || []);
     document.getElementById('listaEvaluaciones').innerHTML = data.map(ev => `
         <tr>
             <td>${ev.colaborador}</td>
@@ -370,19 +384,20 @@ document.getElementById('formEvaluacion').addEventListener('submit', async (e) =
     };
     const res = await fetch('/api/admin/evaluaciones-desempeno', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
         body: JSON.stringify(body)
     });
     if (res.ok) {
         e.target.reset();
         cargarEvaluaciones();
-        alert('Evaluación de desempeño registrada.');
+        alert('Evaluación registrada.');
     }
 });
 
-// MÓDULO V2.0: CONFIABILIDAD (8F), 16PF Y ANTECEDENTES
 async function cargarModuloV2() {
-    const res = await fetch('/api/admin/evaluaciones-resumen');
+    const res = await fetch('/api/admin/evaluaciones-resumen', {
+        headers: { 'x-admin-pass': claveAdmin }
+    });
     if (!res.ok) return;
     const lista = await res.json();
 
@@ -392,15 +407,11 @@ async function cargarModuloV2() {
 
     lista.forEach(c => {
         const link = c.token_acceso ? `${window.location.origin}/evaluacion.html?token=${c.token_acceso}` : '';
-        const resConf = c.indice_global
-            ? `<strong>${c.indice_global}%</strong> (${c.nivel_riesgo})<br><small>Int:${c.puntaje_integridad}% | Rob:${c.puntaje_robo}% | Ver:${c.puntaje_mentira}% | Alc:${c.puntaje_alcohol_drogas}% | Mob:${c.puntaje_mobbing}% | Vio:${c.puntaje_violencia}% | IT:${c.puntaje_riesgo_informatico}% | Aco:${c.puntaje_acoso_sexual}%</small>`
-            : (c.estado_confiabilidad || 'No asignado');
-        const res16 = c.ajuste_perfil
-            ? `Ajuste: <strong>${c.ajuste_perfil}%</strong><br><small>Ext:${c.dimensiones_globales?.Extraversion} | Est:${c.dimensiones_globales?.Estabilidad_Ansiedad} | Ind:${c.dimensiones_globales?.Independencia} | Aut:${c.dimensiones_globales?.Autocontrol}</small>`
-            : (c.estado_16pf || 'No asignado');
+        const resConf = c.indice_global ? `<strong>${c.indice_global}%</strong> (${c.nivel_riesgo})` : (c.estado_confiabilidad || 'No asignado');
+        const res16 = c.ajuste_perfil ? `Ajuste: <strong>${c.ajuste_perfil}%</strong>` : (c.estado_16pf || 'No asignado');
 
         html4 += `<tr>
-            <td><strong>${c.nombres} ${c.apellidos}</strong><br><small>${c.cargo_postulado || ''}</small></td>
+            <td><strong>${c.nombres} ${c.apellidos}</strong></td>
             <td>
                 <label><input type="checkbox" id="chk_conf_${c.id}" ${c.incluye_confiabilidad !== false ? 'checked' : ''}> Confiabilidad 8F</label><br>
                 <label><input type="checkbox" id="chk_16_${c.id}" ${c.incluye_16pf ? 'checked' : ''}> Perfil 16PF</label><br>
@@ -411,7 +422,7 @@ async function cargarModuloV2() {
             <td>${res16}</td>
         </tr>`;
     });
-    html4 += `</tbody></table><p style="font-size:0.8rem; color:var(--muted); margin-top:14px;"><em>Nota Metodológica: Las evaluaciones psicométricas y de confiabilidad miden tendencias actitudinales, rasgos de personalidad y consistencia de respuesta; constituyen un criterio técnico de apoyo y no una afirmación determinante sobre conductas futuras.</em></p>`;
+    html4 += `</tbody></table>`;
     document.getElementById('tablaEvaluaciones').innerHTML = html4;
 
     let html5 = `<table><thead><tr>
@@ -451,7 +462,7 @@ async function habilitarTest(id) {
     const incluye_16pf = document.getElementById(`chk_16_${id}`).checked;
     await fetch('/api/admin/habilitar-test', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-admin-pass': claveAdmin },
         body: JSON.stringify({ postulante_id: id, incluye_confiabilidad, incluye_16pf })
     });
     cargarModuloV2();
@@ -467,7 +478,11 @@ async function guardarAntecedentes(id) {
     if (document.getElementById(`file_jud_${id}`).files[0]) fd.append('pdf_judiciales', document.getElementById(`file_jud_${id}`).files[0]);
     if (document.getElementById(`file_aca_${id}`).files[0]) fd.append('pdf_academicos', document.getElementById(`file_aca_${id}`).files[0]);
 
-    const res = await fetch(`/api/admin/antecedentes/${id}`, { method: 'POST', body: fd });
+    const res = await fetch(`/api/admin/antecedentes/${id}`, {
+        method: 'POST',
+        headers: { 'x-admin-pass': claveAdmin },
+        body: fd
+    });
     if (res.ok) {
         alert('Antecedentes y respaldos guardados.');
         cargarModuloV2();
