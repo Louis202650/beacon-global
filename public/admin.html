@@ -124,7 +124,15 @@
         .grid label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
         .grid input, .grid select { width: 100%; }
     </style>
-    <div class="container">
+</head>
+<body>
+
+<header>
+    <h1>BEACON GLOBAL | Administración de Talento Humano</h1>
+    <a href="/">← Volver al Portal Público</a>
+</header>
+
+<div class="container">
     <!-- LOGIN -->
     <div class="card" id="loginBox" style="max-width: 420px; margin: 60px auto;">
         <h2 style="margin-top:0;">Acceso Restringido</h2>
@@ -275,9 +283,9 @@ async function cargarPostulantes() {
     tbody.innerHTML = data.map(p => `
         <tr>
             <td><strong>${p.cargo_postulado || p.titulo_puesto || ''}</strong></td>
-            <td><strong>${p.nombres} ${p.apellidos}</strong><br><small>C.I.: ${p.cedula}</small><br><small>Ciudad: ${p.ciudad || ''}</small></td>
-            <td>${p.profesion || ''}<br><small>📧 ${p.email}</small><br><small>📱 ${p.telefono || ''}</small></td>
-            <td>${p.archivo_nombre ? `<a href="/api/admin/postulantes/${p.id}/pdf" target="_blank" class="btn">📄 ${p.archivo_nombre}</a>` : 'Sin archivo'}</td>
+            <td><strong>${p.nombres_apellidos || p.nombre_completo || `${p.nombres || ''} ${p.apellidos || ''}`}</strong><br><small>C.I.: ${p.cedula || ''}</small><br><small>Ciudad: ${p.ciudad || ''}</small></td>
+            <td>${p.profesion || ''}<br><small>📧 ${p.correo || p.email || ''}</small><br><small>📱 ${p.celular || p.telefono || ''}</small></td>
+            <td>${(p.cv_nombre || p.archivo_nombre) ? `<a href="/api/admin/postulantes/${p.id}/pdf" target="_blank" class="btn">📄 ${p.cv_nombre || p.archivo_nombre}</a>` : 'Sin archivo'}</td>
             <td>
                 M: <input type="number" step="0.1" id="m_${p.id}" value="${p.nota_meritos || 0}"><br>
                 T: <input type="number" step="0.1" id="t_${p.id}" value="${p.nota_test || 0}" style="margin-top:4px;"><br>
@@ -424,12 +432,13 @@ async function cargarModuloV2() {
     </tr></thead><tbody>`;
 
     lista.forEach(c => {
+        const nom = c.nombres_apellidos || c.nombre_completo || `${c.nombres || ''} ${c.apellidos || ''}`;
         const link = c.token_acceso ? `${window.location.origin}/evaluacion.html?token=${c.token_acceso}` : '';
         const resConf = c.indice_global ? `<strong>${c.indice_global}%</strong> (${c.nivel_riesgo})` : (c.estado_confiabilidad || 'No asignado');
         const res16 = c.ajuste_perfil ? `Ajuste: <strong>${c.ajuste_perfil}%</strong>` : (c.estado_16pf || 'No asignado');
 
         html4 += `<tr>
-            <td><strong>${c.nombres} ${c.apellidos}</strong></td>
+            <td><strong>${nom}</strong></td>
             <td>
                 <label><input type="checkbox" id="chk_conf_${c.id}" ${c.incluye_confiabilidad !== false ? 'checked' : ''}> Confiabilidad 8F</label><br>
                 <label><input type="checkbox" id="chk_16_${c.id}" ${c.incluye_16pf ? 'checked' : ''}> Perfil 16PF</label><br>
@@ -448,8 +457,9 @@ async function cargarModuloV2() {
     </tr></thead><tbody>`;
 
     lista.forEach(c => {
+        const nom = c.nombres_apellidos || c.nombre_completo || `${c.nombres || ''} ${c.apellidos || ''}`;
         html5 += `<tr>
-            <td><strong>${c.nombres} ${c.apellidos}</strong><br><small>C.I.: ${c.cedula}</small></td>
+            <td><strong>${nom}</strong><br><small>C.I.: ${c.cedula || ''}</small></td>
             <td>
                 <select id="est_pen_${c.id}"><option ${c.estado_penales==='PENDIENTE'?'selected':''}>PENDIENTE</option><option ${c.estado_penales==='SIN NOVEDAD'?'selected':''}>SIN NOVEDAD</option><option ${c.estado_penales==='CON OBSERVACION'?'selected':''}>CON OBSERVACION</option></select><br>
                 <input type="file" id="file_pen_${c.id}" accept="application/pdf" style="width:160px; margin-top:5px;">
