@@ -1,209 +1,270 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Beacon Global | Portal de Selección de Personal</title>
-  <style>
-    :root { --bg: #0f172a; --card: #1e293b; --accent: #0ea5e9; --success: #10b981; --text: #f8fafc; --muted: #94a3b8; }
-    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); }
-    header { background: #020617; padding: 18px 32px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-    header h1 { margin: 0; font-size: 1.35rem; color: var(--accent); }
-    .btn-admin { background: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
-    .btn-admin:hover { background: var(--accent); color: #020617; }
-    .container { max-width: 900px; margin: 32px auto; padding: 0 20px; }
-    .card { background: var(--card); border-radius: 12px; padding: 28px; margin-bottom: 24px; border: 1px solid #334155; }
-    h2 { margin-top: 0; color: #e2e8f0; font-size: 1.25rem; }
-    .step-badge { display: inline-block; background: var(--accent); color: #020617; font-weight: 700; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 8px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
-    label { display: block; font-size: 0.88rem; color: var(--muted); margin-bottom: 6px; }
-    input, select { width: 100%; padding: 11px 12px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: var(--text); font-size: 0.95rem; }
-    input:focus, select:focus { outline: none; border-color: var(--accent); }
-    .btn { background: var(--accent); color: #020617; border: none; padding: 12px 22px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; width: 100%; margin-top: 18px; }
-    .btn-success { background: var(--success); color: #020617; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .vacante-info { background: #0f172a; padding: 14px; border-radius: 8px; border-left: 4px solid var(--accent); margin-top: 12px; font-size: 0.9rem; color: #cbd5e1; }
-    .hidden { display: none; }
-    .alert { padding: 14px; border-radius: 8px; margin-top: 16px; font-weight: 500; }
-    .alert-ok { background: rgba(16, 185, 129, 0.15); border: 1px solid var(--success); color: #6ee7b7; }
-    .alert-err { background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BEACON GLOBAL | Talento Humano</title>
+    <style>
+        :root {
+            --bg: #09090b;
+            --card: #141418;
+            --border: #2e2638;
+            --primary: #e11d74;
+            --primary-hover: #be185d;
+            --accent-purple: #a855f7;
+            --text: #f8fafc;
+            --muted: #a1a1aa;
+        }
+        * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body {
+            margin: 0;
+            background-color: var(--bg);
+            background-image:
+                linear-gradient(rgba(225, 29, 116, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
+            background-size: 36px 36px;
+            color: var(--text);
+        }
+        header {
+            background: rgba(9, 9, 11, 0.92);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3f2847;
+            box-shadow: 0 4px 20px rgba(225, 29, 116, 0.12);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            background: linear-gradient(90deg, #f43f5e, #d946ef);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 0.6px;
+            font-weight: 800;
+        }
+        .btn-outline {
+            color: #f472b6;
+            border: 1px solid #e11d74;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            background: rgba(225, 29, 116, 0.15);
+            box-shadow: 0 0 12px rgba(225, 29, 116, 0.35);
+        }
+        .container { max-width: 780px; margin: 35px auto; padding: 0 20px; }
+        .card {
+            background: var(--card);
+            border: 1px solid #382742;
+            border-radius: 14px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(217, 70, 239, 0.15);
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #e11d74, #9333ea);
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 700;
+            padding: 5px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            box-shadow: 0 0 12px rgba(225, 29, 116, 0.4);
+        }
+        h2 { margin: 0 0 8px 0; font-size: 1.5rem; }
+        p.sub { color: var(--muted); font-size: 0.92rem; margin-top: 0; margin-bottom: 22px; line-height: 1.5; }
+        label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 6px; }
+        input[type="text"], input[type="email"], input[type="tel"], input[type="file"], select {
+            width: 100%;
+            background: #0d0d11;
+            color: var(--text);
+            border: 1px solid #382742;
+            border-radius: 8px;
+            padding: 11px 13px;
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #e11d74;
+            box-shadow: 0 0 10px rgba(225, 29, 116, 0.35);
+        }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0 18px; }
+        .btn {
+            width: 100%;
+            background: linear-gradient(135deg, #e11d74, #9333ea);
+            color: #fff;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.98rem;
+            box-shadow: 0 4px 16px rgba(225, 29, 116, 0.4);
+            transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.92; }
+        .hidden { display: none !important; }
+        .alert {
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-top: 16px;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid #10b981;
+            color: #6ee7b7;
+        }
+        .alert-err {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: #ef4444;
+            color: #fca5a5;
+        }
+    </style>
 </head>
 <body>
-  <header>
+
+<header>
     <h1>BEACON GLOBAL | Talento Humano</h1>
-    <a href="/admin.html" class="btn-admin">Acceso Consultor / Admin</a>
-  </header>
+    <a href="/admin.html" class="btn-outline">Acceso Consultor / Admin</a>
+</header>
 
-  <div class="container">
+<div class="container">
     <!-- PASO 1 -->
-    <div class="card" id="cardPaso1">
-      <span class="step-badge">PASO 1 DE 2</span>
-      <h2>Registro de Datos del Postulante</h2>
-      <p style="color: var(--muted); font-size: 0.92rem;">Seleccione la convocatoria vigente y complete sus datos personales y profesionales para habilitar la carga de su Hoja de Vida.</p>
+    <div class="card" id="paso1">
+        <span class="badge">PASO 1 DE 2</span>
+        <h2>Registro de Datos del Postulante</h2>
+        <p class="sub">Seleccione la convocatoria vigente y complete sus datos personales y profesionales para habilitar la carga de su Hoja de Vida.</p>
 
-      <form id="formPaso1">
-        <div style="margin-bottom: 16px;">
-          <label>Cargo / Convocatoria Disponible *</label>
-          <select id="vacante_id" required>
-            <option value="">Cargando convocatorias...</option>
-          </select>
-          <div id="detalleVacante" class="vacante-info hidden"></div>
-        </div>
+        <form id="formPaso1">
+            <label>Cargo / Convocatoria Disponible *</label>
+            <select id="cargo" required>
+                <option value="">-- Cargando vacantes disponibles --</option>
+            </select>
 
-        <div class="grid">
-          <div>
-            <label>Nombres y Apellidos Completos *</label>
-            <input type="text" id="nombre_completo" placeholder="Ej. Juan Carlos Pérez López" required />
-          </div>
-          <div>
-            <label>Número de Cédula (10 dígitos) *</label>
-            <input type="text" id="cedula" maxlength="10" pattern="\d{10}" placeholder="Ej. 1712345678" required />
-          </div>
-          <div>
-            <label>Correo Electrónico *</label>
-            <input type="email" id="correo" placeholder="correo@ejemplo.com" required />
-          </div>
-          <div>
-            <label>Teléfono Celular *</label>
-            <input type="tel" id="celular" placeholder="Ej. 0991234567" required />
-          </div>
-          <div>
-            <label>Ciudad de Residencia *</label>
-            <input type="text" id="ciudad" placeholder="Ej. Quito" required />
-          </div>
-          <div>
-            <label>Profesión / Título Académico *</label>
-            <input type="text" id="profesion" placeholder="Ej. Ingeniero Comercial / Psicólogo Industrial" required />
-          </div>
-        </div>
+            <div class="grid-2">
+                <div>
+                    <label>Nombres y Apellidos Completos *</label>
+                    <input type="text" id="nombres" placeholder="Ej. Juan Carlos Pérez López" required />
+                </div>
+                <div>
+                    <label>Número de Cédula (10 dígitos) *</label>
+                    <input type="text" id="cedula" maxlength="10" placeholder="Ej. 1712345678" required />
+                </div>
+                <div>
+                    <label>Correo Electrónico *</label>
+                    <input type="email" id="correo" placeholder="correo@ejemplo.com" required />
+                </div>
+                <div>
+                    <label>Teléfono Celular *</label>
+                    <input type="tel" id="celular" placeholder="Ej. 0991234567" required />
+                </div>
+                <div>
+                    <label>Ciudad de Residencia *</label>
+                    <input type="text" id="ciudad" placeholder="Ej. Quito" required />
+                </div>
+                <div>
+                    <label>Profesión / Título Académico *</label>
+                    <input type="text" id="profesion" placeholder="Ej. Ingeniero Comercial / Psicólogo Industrial" required />
+                </div>
+            </div>
 
-        <button type="submit" class="btn" id="btnPaso1">Guardar Datos y Continuar al Paso 2 →</button>
-      </form>
-      <div id="msgPaso1"></div>
+            <button type="submit" class="btn">Guardar Datos y Continuar al Paso 2 →</button>
+            <div id="msgPaso1" class="hidden"></div>
+        </form>
     </div>
 
     <!-- PASO 2 -->
-    <div class="card hidden" id="cardPaso2">
-      <span class="step-badge" style="background: var(--success);">PASO 2 DE 2</span>
-      <h2>Carga de Hoja de Vida y Respaldos (PDF)</h2>
-      <p style="color: var(--muted); font-size: 0.92rem;">
-        Postulante: <strong id="resumenPostulante" style="color: #fff;"></strong><br/>
-        Adjunte su Hoja de Vida y certificados de respaldo en formato <strong>PDF</strong> (puede seleccionar hasta 5 archivos PDF de máximo 5 MB cada uno).
-      </p>
+    <div class="card hidden" id="paso2">
+        <span class="badge">PASO 2 DE 2</span>
+        <h2>Carga de Hoja de Vida y Respaldos (PDF)</h2>
+        <p class="sub">Adjunte un único archivo en formato <strong>PDF</strong> con su Hoja de Vida y certificados de respaldo.</p>
 
-      <form id="formPaso2">
-        <label>Seleccionar Archivos PDF (Hoja de Vida, Títulos, Certificados) *</label>
-        <input type="file" id="documentos" accept="application/pdf" multiple required />
-        <button type="submit" class="btn btn-success" id="btnPaso2">Finalizar Postulación y Enviar Documentos</button>
-      </form>
-      <div id="msgPaso2"></div>
+        <form id="formPaso2">
+            <label>Seleccionar Archivo PDF *</label>
+            <input type="file" id="archivoPdf" accept="application/pdf" required />
+            <button type="submit" class="btn">Finalizar Postulación ✓</button>
+            <div id="msgPaso2" class="hidden"></div>
+        </form>
     </div>
-  </div>
+</div>
 
-  <script>
-    let vacantesLista = [];
-    let postulanteActualId = null;
+<script>
+let postulanteId = null;
 
-    async function cargarVacantes() {
-      const sel = document.getElementById('vacante_id');
-      try {
+async function cargarVacantesPublicas() {
+    try {
         const res = await fetch('/api/vacantes-abiertas');
         const data = await res.json();
-        vacantesLista = data.vacantes || [];
-        if (!vacantesLista.length) {
-          sel.innerHTML = '<option value="">No hay convocatorias abiertas en este momento</option>';
-          return;
+        const lista = Array.isArray(data) ? data : (data.vacantes || []);
+        const select = document.getElementById('cargo');
+        if (!lista.length) {
+            select.innerHTML = '<option value="">No hay convocatorias abiertas en este momento</option>';
+            return;
         }
-        sel.innerHTML = '<option value="">-- Seleccione un cargo --</option>' +
-          vacantesLista.map(v => `<option value="${v.id}">${v.codigo} - ${v.titulo_puesto} (${v.ciudad})</option>`).join('');
-      } catch (e) {
-        sel.innerHTML = '<option value="">Error cargando convocatorias</option>';
-      }
+        select.innerHTML = '<option value="">-- Seleccione un cargo --</option>' +
+            lista.map(v => `<option value="${v.codigo} - ${v.titulo_puesto}">${v.codigo} - ${v.titulo_puesto} (${v.ciudad || 'Quito'})</option>`).join('');
+    } catch (e) {
+        document.getElementById('cargo').innerHTML = '<option value="">Error al cargar vacantes</option>';
     }
+}
+cargarVacantesPublicas();
 
-    document.getElementById('vacante_id').addEventListener('change', (e) => {
-      const v = vacantesLista.find(item => item.id == e.target.value);
-      const box = document.getElementById('detalleVacante');
-      if (v) {
-        box.innerHTML = `<strong>Área:</strong> ${v.unidad_area || 'General'} | <strong>Ciudad:</strong> ${v.ciudad}<br/>${v.descripcion || ''}`;
-        box.classList.remove('hidden');
-      } else {
-        box.classList.add('hidden');
-      }
-    });
-
-    document.getElementById('formPaso1').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btnPaso1');
-      const msg = document.getElementById('msgPaso1');
-      btn.disabled = true;
-      msg.innerHTML = '';
-
-      const payload = {
-        vacante_id: document.getElementById('vacante_id').value,
-        nombre_completo: document.getElementById('nombre_completo').value,
+document.getElementById('formPaso1').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('msgPaso1');
+    const body = {
+        cargo_postulado: document.getElementById('cargo').value,
+        nombres_apellidos: document.getElementById('nombres').value,
         cedula: document.getElementById('cedula').value,
         correo: document.getElementById('correo').value,
         celular: document.getElementById('celular').value,
         ciudad: document.getElementById('ciudad').value,
         profesion: document.getElementById('profesion').value
-      };
-
-      try {
-        const res = await fetch('/api/postulaciones/paso1', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json();
-        if (!data.exito) throw new Error(data.error);
-
-        postulanteActualId = data.postulanteId;
-        document.getElementById('resumenPostulante').textContent = `${payload.nombre_completo} (C.I. ${payload.cedula})`;
-        document.getElementById('cardPaso2').classList.remove('hidden');
-        msg.innerHTML = `<div class="alert alert-ok">✓ ${data.mensaje}</div>`;
-        document.getElementById('cardPaso2').scrollIntoView({ behavior: 'smooth' });
-      } catch (err) {
-        msg.innerHTML = `<div class="alert alert-err">⚠ ${err.message}</div>`;
-      } finally {
-        btn.disabled = false;
-      }
+    };
+    const res = await fetch('/api/postulantes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
     });
+    const data = await res.json();
+    if (res.ok && (data.id || data.postulante?.id)) {
+        postulanteId = data.id || data.postulante.id;
+        document.getElementById('paso1').classList.add('hidden');
+        document.getElementById('paso2').classList.remove('hidden');
+    } else {
+        msg.className = 'alert alert-err';
+        msg.innerText = data.error || 'No se pudo registrar la postulación. Verifique los datos.';
+        msg.classList.remove('hidden');
+    }
+});
 
-    document.getElementById('formPaso2').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('btnPaso2');
-      const msg = document.getElementById('msgPaso2');
-      const files = document.getElementById('documentos').files;
-      if (!files.length) return;
-
-      btn.disabled = true;
-      const formData = new FormData();
-      for (let i = 0; i < files.length; i++) {
-        formData.append('documentos', files[i]);
-      }
-
-      try {
-        const res = await fetch(`/api/postulaciones/paso2/${postulanteActualId}`, {
-          method: 'POST',
-          body: formData
-        });
-        const data = await res.json();
-        if (!data.exito) throw new Error(data.error);
-
-        msg.innerHTML = `<div class="alert alert-ok">✓ ${data.mensaje}<br/>Su postulación ha quedado registrada en Beacon Global.</div>`;
-        document.getElementById('formPaso2').reset();
-      } catch (err) {
-        msg.innerHTML = `<div class="alert alert-err">⚠ ${err.message}</div>`;
-      } finally {
-        btn.disabled = false;
-      }
+document.getElementById('formPaso2').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const msg = document.getElementById('msgPaso2');
+    const fd = new FormData();
+    fd.append('cv', document.getElementById('archivoPdf').files[0]);
+    const res = await fetch(`/api/postulantes/${postulanteId}/cv`, {
+        method: 'POST',
+        body: fd
     });
-
-    cargarVacantes();
-  </script>
+    if (res.ok) {
+        msg.className = 'alert';
+        msg.innerText = '¡Postulación enviada con éxito! Su Hoja de Vida ha sido registrada en el sistema de Beacon Global.';
+        msg.classList.remove('hidden');
+        e.target.reset();
+    } else {
+        msg.className = 'alert alert-err';
+        msg.innerText = 'Error al subir el PDF. Intente nuevamente.';
+        msg.classList.remove('hidden');
+    }
+});
+</script>
 </body>
 </html>
